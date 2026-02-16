@@ -28,6 +28,8 @@ export type ZillowResponse = {
 
 export type CoverageType = 'whole' | 'specific' | null;
 
+export type CleaningFrequency = 'one-time' | 'weekly' | 'monthly';
+
 export type FlooringState = {
   step: number;
   useZillow: boolean | null;
@@ -54,6 +56,7 @@ export type CleaningState = {
   rooms: Room[];
   selectedRooms: string[];
   cleaningType: CleaningTypeOption | null;
+  frequency: CleaningFrequency | null;
   estimate: number | null;
   contact: { name: string; email: string; phone: string };
 };
