@@ -5,10 +5,9 @@ import { Search, MapPin } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 import { fetchZillowData } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
-import type { Room } from '@/types';
 
 interface ZillowFetcherProps {
-  onDataFetched: (totalSqFt: number, rooms: Room[], address: string) => void;
+  onDataFetched: (totalSqFt: number, address: string) => void;
   onSkip: () => void;
 }
 
@@ -25,7 +24,7 @@ const ZillowFetcher = ({ onDataFetched, onSkip }: ZillowFetcherProps) => {
     setLoading(true);
     try {
       const data = await fetchZillowData(address.trim());
-      onDataFetched(data.totalSqFt, data.rooms, data.address);
+      onDataFetched(data.totalSqFt, data.address);
     } catch {
       toast({ title: 'Error fetching property data', description: 'Please try again or enter data manually.', variant: 'destructive' });
     } finally {
@@ -39,7 +38,7 @@ const ZillowFetcher = ({ onDataFetched, onSkip }: ZillowFetcherProps) => {
         <MapPin className="h-10 w-10 mx-auto text-secondary" />
         <h2 className="text-lg font-semibold">How would you like to provide property details?</h2>
         <p className="text-sm text-muted-foreground">
-          Search for your property or enter details manually
+          Look up your property's total square footage via Zillow, or enter details manually.
         </p>
       </div>
 
@@ -61,7 +60,7 @@ const ZillowFetcher = ({ onDataFetched, onSkip }: ZillowFetcherProps) => {
 
       {loading && (
         <div className="flex justify-center py-4">
-          <LoadingSpinner text="Fetching property data from Zillow..." />
+          <LoadingSpinner text="Fetching square footage from Zillow..." />
         </div>
       )}
 

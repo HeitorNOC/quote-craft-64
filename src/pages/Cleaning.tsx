@@ -41,10 +41,10 @@ const Cleaning = () => {
     setStep(2);
   }, [setContact, setStep]);
 
-  const handleZillowData = useCallback((totalSqFt: number, rooms: Room[]) => {
+  const handleZillowData = useCallback((totalSqFt: number, _address: string) => {
     setUseZillow(true);
-    setZillowData(totalSqFt, rooms);
-    setStep(4);
+    setZillowData(totalSqFt);
+    setStep(3); // Go to manual room entry (Zillow only provides total sqFt)
   }, [setUseZillow, setZillowData, setStep]);
 
   const handleSkipZillow = useCallback(() => {
@@ -99,7 +99,7 @@ const Cleaning = () => {
         <ZillowFetcher onDataFetched={handleZillowData} onSkip={handleSkipZillow} />
       )}
       {c.step === 3 && (
-        <ManualRoomForm initialRooms={c.rooms.length ? c.rooms : undefined} onSubmit={handleManualRooms} />
+        <ManualRoomForm initialRooms={c.rooms.length ? c.rooms : undefined} zillowTotalSqFt={c.useZillow ? c.totalSqFt : undefined} onSubmit={handleManualRooms} />
       )}
       {c.step === 4 && (
         <RoomSelector rooms={c.rooms} selectedRooms={c.selectedRooms} onChange={setSelectedRooms} onContinue={handleRoomsContinue} />
