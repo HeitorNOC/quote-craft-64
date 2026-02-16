@@ -2,12 +2,12 @@ import { useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useServiceStore } from '@/store/useServiceStore';
 import WizardLayout from '@/components/WizardLayout';
+import ContactInfoStep from '@/components/ContactInfoStep';
 import ZillowFetcher from '@/components/ZillowFetcher';
 import ManualRoomForm from '@/components/ManualRoomForm';
 import RoomSelector from '@/components/RoomSelector';
 import CleaningTypeSelect from '@/components/CleaningTypeSelect';
 import EstimateCard from '@/components/EstimateCard';
-import ContactForm from '@/components/ContactForm';
 import { calculateCleaningEstimate } from '@/lib/utils';
 import type { Room, CleaningTypeOption } from '@/types';
 
@@ -18,6 +18,7 @@ const Cleaning = () => {
   const service = useServiceStore(s => s.service);
   const c = useServiceStore(s => s.cleaning);
   const setStep = useServiceStore(s => s.setCleaningStep);
+  const setContact = useServiceStore(s => s.setCleaningContact);
   const setUseZillow = useServiceStore(s => s.setCleaningUseZillow);
   const setZillowData = useServiceStore(s => s.setCleaningZillowData);
   const setManualRooms = useServiceStore(s => s.setCleaningManualRooms);
@@ -35,34 +36,37 @@ const Cleaning = () => {
     else navigate('/');
   }, [c.step, setStep, navigate]);
 
+  const handleContact = useCallback((data: { name: string; email: string; phone: string }) => {
+    setContact(data);
+    setStep(2);
+  }, [setContact, setStep]);
+
   const handleZillowData = useCallback((totalSqFt: number, rooms: Room[]) => {
     setUseZillow(true);
     setZillowData(totalSqFt, rooms);
-    setStep(3);
+    setStep(4);
   }, [setUseZillow, setZillowData, setStep]);
 
   const handleSkipZillow = useCallback(() => {
     setUseZillow(false);
-    setStep(2);
+    setStep(3);
   }, [setUseZillow, setStep]);
 
   const handleManualRooms = useCallback((rooms: Room[]) => {
     setManualRooms(rooms);
-    setStep(3);
+    setStep(4);
   }, [setManualRooms, setStep]);
 
-  const handleRoomsContinue = useCallback(() => setStep(4), [setStep]);
+  const handleRoomsContinue = useCallback(() => setStep(5), [setStep]);
 
   const handleCleaningSelect = useCallback((type: CleaningTypeOption) => {
     setCleaningType(type);
     const est = calculateCleaningEstimate(c.selectedRooms, c.rooms, type.pricePerSqFt, FLAT_FEE);
     setEstimate(est);
-    setStep(5);
+    setStep(6);
   }, [setCleaningType, setEstimate, setStep, c.selectedRooms, c.rooms]);
 
-  const handleSchedule = useCallback(() => setStep(6), [setStep]);
-
-  const handleContactSuccess = useCallback(() => {
+  const handleEstimateSubmit = useCallback(() => {
     resetAll();
     navigate('/');
   }, [resetAll, navigate]);
@@ -73,12 +77,12 @@ const Cleaning = () => {
   );
 
   const stepTitles: Record<number, string> = {
-    1: 'Property Data Source',
-    2: 'Enter Room Details',
-    3: 'Select Areas',
-    4: 'Choose Cleaning Type',
-    5: 'Your Estimate',
-    6: 'Contact Information',
+    1: 'Contact Information',
+    2: 'Property Data Source',
+    3: 'Enter Room Details',
+    4: 'Select Areas',
+    5: 'Choose Cleaning Type',
+    6: 'Your Estimate',
   };
 
   if (service !== 'cleaning') return null;
@@ -86,37 +90,32 @@ const Cleaning = () => {
   return (
     <WizardLayout step={c.step} title={stepTitles[c.step] ?? ''} onBack={goBack}>
       {c.step === 1 && (
-        <ZillowFetcher onDataFetched={handleZillowData} onSkip={handleSkipZillow} />
+        <ContactInfoStep
+          initialValues={c.contact.name ? c.contact : undefined}
+          onSubmit={handleContact}
+        />
       )}
       {c.step === 2 && (
-        <ManualRoomForm initialRooms={c.rooms.length ? c.rooms : undefined} onSubmit={handleManualRooms} />
+        <ZillowFetcher onDataFetched={handleZillowData} onSkip={handleSkipZillow} />
       )}
       {c.step === 3 && (
-        <RoomSelector rooms={c.rooms} selectedRooms={c.selectedRooms} onChange={setSelectedRooms} onContinue={handleRoomsContinue} />
+        <ManualRoomForm initialRooms={c.rooms.length ? c.rooms : undefined} onSubmit={handleManualRooms} />
       )}
       {c.step === 4 && (
+        <RoomSelector rooms={c.rooms} selectedRooms={c.selectedRooms} onChange={setSelectedRooms} onContinue={handleRoomsContinue} />
+      )}
+      {c.step === 5 && (
         <CleaningTypeSelect onSelect={handleCleaningSelect} />
       )}
-      {c.step === 5 && c.estimate !== null && c.cleaningType && (
+      {c.step === 6 && c.estimate !== null && c.cleaningType && (
         <EstimateCard
           estimate={c.estimate}
           flatFee={FLAT_FEE}
           totalSqFt={totalSelectedSqFt}
           pricePerSqFt={c.cleaningType.pricePerSqFt}
           serviceType="cleaning"
-          onSchedule={handleSchedule}
-        />
-      )}
-      {c.step === 6 && (
-        <ContactForm
-          payload={{
-            service: 'cleaning',
-            rooms: c.selectedRooms,
-            totalSqFt: totalSelectedSqFt,
-            cleaningType: c.cleaningType,
-            estimate: c.estimate,
-          }}
-          onSuccess={handleContactSuccess}
+          contact={c.contact}
+          onSchedule={handleEstimateSubmit}
         />
       )}
     </WizardLayout>

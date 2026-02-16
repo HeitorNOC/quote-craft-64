@@ -38,7 +38,7 @@ export type FlooringState = {
   manualMaterial: ManualMaterial | null;
   materialSource: MaterialSource | null;
   estimate: number | null;
-  contact: { email: string; phone: string };
+  contact: { name: string; email: string; phone: string };
 };
 
 export type CleaningState = {
@@ -50,7 +50,7 @@ export type CleaningState = {
   selectedRooms: string[];
   cleaningType: CleaningTypeOption | null;
   estimate: number | null;
-  contact: { email: string; phone: string };
+  contact: { name: string; email: string; phone: string };
 };
 
 export type Service = 'flooring' | 'cleaning' | null;
