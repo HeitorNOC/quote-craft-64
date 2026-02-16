@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, DollarSign } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
+import { submitEstimate } from '@/lib/api';
+import { useToast } from '@/hooks/use-toast';
+import LoadingSpinner from './LoadingSpinner';
 
 interface EstimateCardProps {
   estimate: number;
@@ -9,10 +13,27 @@ interface EstimateCardProps {
   totalSqFt: number;
   pricePerSqFt: number;
   serviceType: 'flooring' | 'cleaning';
+  contact: { name: string; email: string; phone: string };
   onSchedule: () => void;
 }
 
-const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType, onSchedule }: EstimateCardProps) => {
+const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType, contact, onSchedule }: EstimateCardProps) => {
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
+
+  const handleSubmit = async () => {
+    setSubmitting(true);
+    try {
+      await submitEstimate({ serviceType, estimate, totalSqFt, pricePerSqFt, flatFee, contact });
+      toast({ title: 'Estimate submitted!', description: 'We\'ll be in touch soon.' });
+      onSchedule();
+    } catch {
+      toast({ title: 'Submission failed', description: 'Please try again.', variant: 'destructive' });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="space-y-6 text-center">
       <DollarSign className="h-12 w-12 mx-auto text-secondary" />
@@ -39,8 +60,8 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
         </p>
       </div>
 
-      <Button size="lg" className="w-full" onClick={onSchedule}>
-        Schedule a Visit
+      <Button size="lg" className="w-full" onClick={handleSubmit} disabled={submitting}>
+        {submitting ? <LoadingSpinner text="Submitting..." /> : 'Submit & Schedule a Visit'}
       </Button>
     </div>
   );

@@ -13,12 +13,12 @@ interface WizardLayoutProps {
 }
 
 const stepLabels = [
+  'Contact',
   'Data Source',
   'Property Details',
   'Select Areas',
   'Service Options',
   'Estimate',
-  'Contact',
 ];
 
 const WizardLayout = ({ step, totalSteps = 6, title, subtitle, onBack, children }: WizardLayoutProps) => {

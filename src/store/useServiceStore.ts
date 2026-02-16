@@ -10,13 +10,13 @@ const STORAGE_KEY = 'jdServiceStore';
 const defaultFlooring: FlooringState = {
   step: 1, useZillow: null, address: '', totalSqFt: 0, rooms: [],
   selectedRooms: [], material: null, manualMaterial: null,
-  materialSource: null, estimate: null, contact: { email: '', phone: '' },
+  materialSource: null, estimate: null, contact: { name: '', email: '', phone: '' },
 };
 
 const defaultCleaning: CleaningState = {
   step: 1, useZillow: null, address: '', totalSqFt: 0, rooms: [],
   selectedRooms: [], cleaningType: null, estimate: null,
-  contact: { email: '', phone: '' },
+  contact: { name: '', email: '', phone: '' },
 };
 
 interface ServiceStore {
@@ -36,7 +36,7 @@ interface ServiceStore {
   setFlooringManualMaterial: (m: ManualMaterial | null) => void;
   setFlooringMaterialSource: (s: MaterialSource | null) => void;
   setFlooringEstimate: (v: number | null) => void;
-  setFlooringContact: (c: { email: string; phone: string }) => void;
+  setFlooringContact: (c: { name: string; email: string; phone: string }) => void;
   // Cleaning actions
   setCleaningStep: (step: number) => void;
   setCleaningUseZillow: (v: boolean) => void;
@@ -46,7 +46,7 @@ interface ServiceStore {
   setCleaningSelectedRooms: (rooms: string[]) => void;
   setCleaningType: (t: CleaningTypeOption | null) => void;
   setCleaningEstimate: (v: number | null) => void;
-  setCleaningContact: (c: { email: string; phone: string }) => void;
+  setCleaningContact: (c: { name: string; email: string; phone: string }) => void;
   // Reset
   resetAll: () => void;
 }
