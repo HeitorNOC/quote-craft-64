@@ -1,27 +1,36 @@
 import type { ZillowResponse, MaterialOption, CleaningTypeOption } from '@/types';
 
-// TODO: Replace with real Zillow API call using ZILLOW_API_KEY
+// ---------------------------------------------------------------------------
+// 1️⃣ Zillow – mock
+// TODO: Replace with a real property data API. Options:
+//   - ZenRows Zillow API: https://realestate.api.zenrows.com/v1/targets/zillow/properties/{zpid}
+//     Requires: ZENROWS_API_KEY (paid). Returns living area, lot size, bedrooms, etc.
+//   - Apify Zillow Scraper: https://apify.com/zillowscraper/zillow-property-details
+//     Requires: APIFY_API_TOKEN (paid). Accepts ZUID or URL.
+//   - Zillow does NOT have a free public API. All options require third-party services.
+//   - Note: Zillow provides total sq ft only, NOT individual room breakdowns.
+// ---------------------------------------------------------------------------
 export async function fetchZillowData(address: string): Promise<ZillowResponse> {
   await new Promise(r => setTimeout(r, 800));
-  // Simulate random error ~10% of the time
   if (Math.random() < 0.1) throw new Error('Failed to fetch property data');
   return {
     address,
     totalSqFt: 2100,
-    rooms: [
-      { name: 'Living Room', sqFt: 350 },
-      { name: 'Kitchen', sqFt: 240 },
-      { name: 'Master Bedroom', sqFt: 300 },
-      { name: 'Bedroom 2', sqFt: 250 },
-      { name: 'Bedroom 3', sqFt: 220 },
-      { name: 'Bathroom 1', sqFt: 120 },
-      { name: 'Bathroom 2', sqFt: 80 },
-      { name: 'Hallway/Utility', sqFt: 200 },
-    ],
   };
 }
 
-// TODO: Replace with real Home Depot API
+// ---------------------------------------------------------------------------
+// 2️⃣ Home Depot materials – mock
+// TODO: Replace with a real Home Depot product API. Options:
+//   - BigBox API (by Traject Data): https://docs.trajectdata.com/bigboxapi/homedepot-product-data-api
+//     Endpoint: GET https://api.bigboxapi.com/request?api_key=XXX&type=search&search_term=vinyl+flooring
+//     Requires: BIGBOX_API_KEY (paid, from trajectdata.com)
+//     Returns: product name, price, item_id, url, images, ratings, etc.
+//   - Apify Home Depot Scraper: https://apify.com/maplerope44/home-depot-product-lookup
+//     Requires: APIFY_API_TOKEN (paid). Accepts product ID + zip code.
+//   - Home Depot does NOT have a free public developer API.
+//   - To get price per sq ft, divide product price by coverage area (listed in specs).
+// ---------------------------------------------------------------------------
 export async function fetchHomeDepotMaterials(): Promise<MaterialOption[]> {
   await new Promise(r => setTimeout(r, 500));
   return [
@@ -32,7 +41,17 @@ export async function fetchHomeDepotMaterials(): Promise<MaterialOption[]> {
   ];
 }
 
-// TODO: Replace with real Lowe's API
+// ---------------------------------------------------------------------------
+// 3️⃣ Lowe's materials – mock
+// TODO: Replace with a real Lowe's product API. Options:
+//   - WebScrapingAPI Lowe's API: https://ecom.webscrapingapi.com/v1?api_key=XXX&engine=lowes&type=search&search_term=vinyl+flooring
+//     Requires: WEBSCRAPINGAPI_KEY (paid, from webscrapingapi.com)
+//     Returns: product name, price, product_id, url, images, ratings, etc.
+//   - Apify Lowe's Scraper: https://apify.com/maplerope44/lowes-product-lookup
+//     Requires: APIFY_API_TOKEN (paid). Accepts product ID.
+//   - Lowe's does NOT have a free public developer API.
+//   - To get price per sq ft, divide product price by coverage area (listed in specs).
+// ---------------------------------------------------------------------------
 export async function fetchLowesMaterials(): Promise<MaterialOption[]> {
   await new Promise(r => setTimeout(r, 500));
   return [
@@ -43,6 +62,9 @@ export async function fetchLowesMaterials(): Promise<MaterialOption[]> {
   ];
 }
 
+// ---------------------------------------------------------------------------
+// 4️⃣ Cleaning types – mock
+// ---------------------------------------------------------------------------
 export async function fetchCleaningTypes(): Promise<CleaningTypeOption[]> {
   await new Promise(r => setTimeout(r, 400));
   return [
@@ -53,7 +75,10 @@ export async function fetchCleaningTypes(): Promise<CleaningTypeOption[]> {
   ];
 }
 
-// TODO: Replace with real backend POST endpoint
+// ---------------------------------------------------------------------------
+// 5️⃣ Submit estimate – mock
+// TODO: Replace with POST to your backend (e.g., /api/quote or a form service)
+// ---------------------------------------------------------------------------
 export async function submitEstimate(payload: unknown): Promise<void> {
   console.log('🧾 Estimate submitted →', JSON.stringify(payload, null, 2));
   await new Promise(r => setTimeout(r, 800));

@@ -24,7 +24,6 @@ export type CleaningTypeOption = {
 export type ZillowResponse = {
   address: string;
   totalSqFt: number;
-  rooms: Room[];
 };
 
 export type FlooringState = {
