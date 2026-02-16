@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type {
   Service, FlooringState, CleaningState,
   Room, MaterialOption, ManualMaterial, MaterialSource,
-  CleaningTypeOption, CoverageType,
+  CleaningTypeOption, CoverageType, CleaningFrequency,
 } from '@/types';
 
 const STORAGE_KEY = 'jdServiceStore';
@@ -17,7 +17,7 @@ const defaultFlooring: FlooringState = {
 const defaultCleaning: CleaningState = {
   step: 1, useZillow: null, address: '', totalSqFt: 0,
   coverageType: null, knowsSqFt: null,
-  rooms: [], selectedRooms: [], cleaningType: null, estimate: null,
+  rooms: [], selectedRooms: [], cleaningType: null, frequency: null, estimate: null,
   contact: { name: '', email: '', phone: '' },
 };
 
@@ -51,6 +51,7 @@ interface ServiceStore {
   setCleaningCoverageType: (c: CoverageType) => void;
   setCleaningKnowsSqFt: (v: boolean | null) => void;
   setCleaningType: (t: CleaningTypeOption | null) => void;
+  setCleaningFrequency: (f: CleaningFrequency) => void;
   setCleaningEstimate: (v: number | null) => void;
   setCleaningContact: (c: { name: string; email: string; phone: string }) => void;
   // Reset
@@ -112,6 +113,7 @@ export const useServiceStore = create<ServiceStore>((set, get) => {
     setCleaningCoverageType: (c) => persistSet(st => ({ cleaning: { ...st.cleaning, coverageType: c } })),
     setCleaningKnowsSqFt: (v) => persistSet(st => ({ cleaning: { ...st.cleaning, knowsSqFt: v } })),
     setCleaningType: (t) => persistSet(st => ({ cleaning: { ...st.cleaning, cleaningType: t } })),
+    setCleaningFrequency: (f) => persistSet(st => ({ cleaning: { ...st.cleaning, frequency: f } })),
     setCleaningEstimate: (v) => persistSet(st => ({ cleaning: { ...st.cleaning, estimate: v } })),
     setCleaningContact: (c) => persistSet(st => ({ cleaning: { ...st.cleaning, contact: c } })),
 
