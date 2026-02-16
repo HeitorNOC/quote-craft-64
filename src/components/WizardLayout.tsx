@@ -8,26 +8,21 @@ interface WizardLayoutProps {
   totalSteps?: number;
   title: string;
   subtitle?: string;
+  stepLabels?: string[];
   onBack?: () => void;
   children: React.ReactNode;
 }
 
-const stepLabels = [
-  'Contact',
-  'Data Source',
-  'Property Details',
-  'Select Areas',
-  'Service Options',
-  'Estimate',
-];
+const defaultLabels = ['Contact', 'Data Source', 'Coverage', 'Details', 'Options', 'Estimate'];
 
-const WizardLayout = ({ step, totalSteps = 6, title, subtitle, onBack, children }: WizardLayoutProps) => {
+const WizardLayout = ({ step, totalSteps = 6, title, subtitle, stepLabels, onBack, children }: WizardLayoutProps) => {
   const progress = (step / totalSteps) * 100;
+  const labels = stepLabels ?? defaultLabels;
+  const currentLabel = labels[step - 1] ?? '';
 
   return (
     <div className="min-h-screen bg-background py-8 px-4">
       <div className="mx-auto max-w-2xl animate-fade-in">
-        {/* Header */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-4">
             {onBack && (
@@ -37,7 +32,7 @@ const WizardLayout = ({ step, totalSteps = 6, title, subtitle, onBack, children 
             )}
             <div>
               <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                Step {step} of {totalSteps} — {stepLabels[step - 1]}
+                Step {step} of {totalSteps} — {currentLabel}
               </p>
               <h1 className="text-2xl font-display font-bold text-foreground">{title}</h1>
               {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
@@ -46,7 +41,6 @@ const WizardLayout = ({ step, totalSteps = 6, title, subtitle, onBack, children 
           <Progress value={progress} className="h-2" />
         </div>
 
-        {/* Content */}
         <Card className="p-6 shadow-lg border-border/50 animate-slide-in">
           {children}
         </Card>

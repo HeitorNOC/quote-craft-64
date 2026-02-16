@@ -2,20 +2,22 @@ import { create } from 'zustand';
 import type {
   Service, FlooringState, CleaningState,
   Room, MaterialOption, ManualMaterial, MaterialSource,
-  CleaningTypeOption,
+  CleaningTypeOption, CoverageType,
 } from '@/types';
 
 const STORAGE_KEY = 'jdServiceStore';
 
 const defaultFlooring: FlooringState = {
-  step: 1, useZillow: null, address: '', totalSqFt: 0, rooms: [],
-  selectedRooms: [], material: null, manualMaterial: null,
+  step: 1, useZillow: null, address: '', totalSqFt: 0,
+  coverageType: null, knowsSqFt: null,
+  rooms: [], selectedRooms: [], material: null, manualMaterial: null,
   materialSource: null, estimate: null, contact: { name: '', email: '', phone: '' },
 };
 
 const defaultCleaning: CleaningState = {
-  step: 1, useZillow: null, address: '', totalSqFt: 0, rooms: [],
-  selectedRooms: [], cleaningType: null, estimate: null,
+  step: 1, useZillow: null, address: '', totalSqFt: 0,
+  coverageType: null, knowsSqFt: null,
+  rooms: [], selectedRooms: [], cleaningType: null, estimate: null,
   contact: { name: '', email: '', phone: '' },
 };
 
@@ -32,6 +34,8 @@ interface ServiceStore {
   setFlooringZillowData: (totalSqFt: number) => void;
   setFlooringManualRooms: (rooms: Room[]) => void;
   setFlooringSelectedRooms: (rooms: string[]) => void;
+  setFlooringCoverageType: (c: CoverageType) => void;
+  setFlooringKnowsSqFt: (v: boolean | null) => void;
   setFlooringMaterial: (m: MaterialOption | null) => void;
   setFlooringManualMaterial: (m: ManualMaterial | null) => void;
   setFlooringMaterialSource: (s: MaterialSource | null) => void;
@@ -44,6 +48,8 @@ interface ServiceStore {
   setCleaningZillowData: (totalSqFt: number) => void;
   setCleaningManualRooms: (rooms: Room[]) => void;
   setCleaningSelectedRooms: (rooms: string[]) => void;
+  setCleaningCoverageType: (c: CoverageType) => void;
+  setCleaningKnowsSqFt: (v: boolean | null) => void;
   setCleaningType: (t: CleaningTypeOption | null) => void;
   setCleaningEstimate: (v: number | null) => void;
   setCleaningContact: (c: { name: string; email: string; phone: string }) => void;
@@ -89,6 +95,8 @@ export const useServiceStore = create<ServiceStore>((set, get) => {
     setFlooringZillowData: (totalSqFt) => persistSet(st => ({ flooring: { ...st.flooring, totalSqFt } })),
     setFlooringManualRooms: (rooms) => persistSet(st => ({ flooring: { ...st.flooring, rooms, totalSqFt: rooms.reduce((s, r) => s + r.sqFt, 0) } })),
     setFlooringSelectedRooms: (rooms) => persistSet(st => ({ flooring: { ...st.flooring, selectedRooms: rooms } })),
+    setFlooringCoverageType: (c) => persistSet(st => ({ flooring: { ...st.flooring, coverageType: c } })),
+    setFlooringKnowsSqFt: (v) => persistSet(st => ({ flooring: { ...st.flooring, knowsSqFt: v } })),
     setFlooringMaterial: (m) => persistSet(st => ({ flooring: { ...st.flooring, material: m } })),
     setFlooringManualMaterial: (m) => persistSet(st => ({ flooring: { ...st.flooring, manualMaterial: m } })),
     setFlooringMaterialSource: (s) => persistSet(st => ({ flooring: { ...st.flooring, materialSource: s } })),
@@ -101,6 +109,8 @@ export const useServiceStore = create<ServiceStore>((set, get) => {
     setCleaningZillowData: (totalSqFt) => persistSet(st => ({ cleaning: { ...st.cleaning, totalSqFt } })),
     setCleaningManualRooms: (rooms) => persistSet(st => ({ cleaning: { ...st.cleaning, rooms, totalSqFt: rooms.reduce((s, r) => s + r.sqFt, 0) } })),
     setCleaningSelectedRooms: (rooms) => persistSet(st => ({ cleaning: { ...st.cleaning, selectedRooms: rooms } })),
+    setCleaningCoverageType: (c) => persistSet(st => ({ cleaning: { ...st.cleaning, coverageType: c } })),
+    setCleaningKnowsSqFt: (v) => persistSet(st => ({ cleaning: { ...st.cleaning, knowsSqFt: v } })),
     setCleaningType: (t) => persistSet(st => ({ cleaning: { ...st.cleaning, cleaningType: t } })),
     setCleaningEstimate: (v) => persistSet(st => ({ cleaning: { ...st.cleaning, estimate: v } })),
     setCleaningContact: (c) => persistSet(st => ({ cleaning: { ...st.cleaning, contact: c } })),

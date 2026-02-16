@@ -26,11 +26,15 @@ export type ZillowResponse = {
   totalSqFt: number;
 };
 
+export type CoverageType = 'whole' | 'specific' | null;
+
 export type FlooringState = {
   step: number;
   useZillow: boolean | null;
   address: string;
   totalSqFt: number;
+  coverageType: CoverageType;
+  knowsSqFt: boolean | null;
   rooms: Room[];
   selectedRooms: string[];
   material: MaterialOption | null;
@@ -45,6 +49,8 @@ export type CleaningState = {
   useZillow: boolean | null;
   address: string;
   totalSqFt: number;
+  coverageType: CoverageType;
+  knowsSqFt: boolean | null;
   rooms: Room[];
   selectedRooms: string[];
   cleaningType: CleaningTypeOption | null;
