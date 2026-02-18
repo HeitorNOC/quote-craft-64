@@ -27,12 +27,24 @@ const MaterialSelector = ({ onSelect }: MaterialSelectorProps) => {
   useEffect(() => {
     fetchHomeDepotMaterials()
       .then(setHdMaterials)
-      .catch(() => toast({ title: 'Error loading Home Depot materials', variant: 'destructive' }))
+      .catch(() => {
+        toast({ 
+          title: 'Failed to load Home Depot materials', 
+          description: 'Please try again or choose another provider',
+          variant: 'destructive' 
+        });
+      })
       .finally(() => setLoadingHd(false));
 
     fetchLowesMaterials()
       .then(setLsMaterials)
-      .catch(() => toast({ title: 'Error loading Lowe\'s materials', variant: 'destructive' }))
+      .catch(() => {
+        toast({ 
+          title: 'Failed to load Lowe\'s materials', 
+          description: 'Please try again or choose another provider',
+          variant: 'destructive' 
+        });
+      })
       .finally(() => setLoadingLs(false));
   }, [toast]);
 
@@ -65,7 +77,7 @@ const MaterialSelector = ({ onSelect }: MaterialSelectorProps) => {
           <SelectTrigger>
             <SelectValue placeholder="Choose a material" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="max-h-[250px]">
             {materials.map(m => (
               <SelectItem key={m.id} value={m.id}>
                 {m.name} — ${m.pricePerSqFt.toFixed(2)}/sq ft

@@ -25,8 +25,8 @@ const WizardLayout = ({ step, totalSteps = 6, title, subtitle, stepLabels, onBac
     <div className="relative min-h-screen bg-background py-8 px-4 flex flex-col" style={bgImage ? { backgroundImage: `url(${bgImage})`, backgroundSize: 'cover', backgroundPosition: 'center' } : {}}>
       {bgImage && <div className="absolute inset-0 bg-foreground/60" />}
       <div className="relative z-10 mx-auto max-w-2xl w-full animate-fade-in flex flex-col flex-1">
-        <img src="/LogoJD.JPG" alt="JD Logo" className="h-48 w-48 drop-shadow mb-2 object-contain" style={{ borderRadius: 999 }} />
-        <div className="flex items-center justify-center flex-1">
+        <img src="/LogoJD.JPG" alt="JD Logo" className="h-32 w-32 drop-shadow mb-0 object-contain mx-auto" style={{ borderRadius: 999 }} />
+        <div className="flex mt-4 justify-center flex-1">
           <div className="w-full flex flex-col">
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-4">

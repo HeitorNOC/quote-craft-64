@@ -6,7 +6,7 @@ import ContactInfoStep from '@/components/ContactInfoStep';
 import ZillowFetcher from '@/components/ZillowFetcher';
 import ManualRoomForm from '@/components/ManualRoomForm';
 import RoomSelector from '@/components/RoomSelector';
-import MaterialSelector from '@/components/MaterialSelector';
+import FlooringMaterialSelector from '@/components/FlooringMaterialSelector';
 import EstimateCard from '@/components/EstimateCard';
 import CoverageChoiceStep from '@/components/CoverageChoiceStep';
 import SqFtKnowledgeStep from '@/components/SqFtKnowledgeStep';
@@ -184,7 +184,7 @@ const Flooring = () => {
         <TotalSqFtStep initialValue={f.totalSqFt || undefined} onSubmit={handleTotalSqFt} />
       )}
       {f.step === 5 && f.coverageType === 'whole' && (
-        <MaterialSelector onSelect={handleMaterialSelect} />
+        <FlooringMaterialSelector onSelect={handleMaterialSelect} />
       )}
       {f.step === 6 && f.coverageType === 'whole' && f.estimate !== null && (
         <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} onSchedule={handleEstimateSubmit} />
@@ -204,7 +204,7 @@ const Flooring = () => {
         <RoomSelector rooms={f.rooms} selectedRooms={f.selectedRooms} onChange={setSelectedRooms} onContinue={handleRoomsContinue} />
       )}
       {f.step === 7 && f.coverageType === 'specific' && (
-        <MaterialSelector onSelect={handleMaterialSelect} />
+        <FlooringMaterialSelector onSelect={handleMaterialSelect} />
       )}
       {f.step === 8 && f.coverageType === 'specific' && f.estimate !== null && (
         <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} onSchedule={handleEstimateSubmit} />
