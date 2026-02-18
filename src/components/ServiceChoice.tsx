@@ -61,36 +61,38 @@ const ServiceChoice = () => {
 
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
-        <header className="text-center py-16 px-4">
-          <h1 className="text-4xl md:text-5xl font-display font-bold text-primary-foreground mb-3 drop-shadow-lg">
+        <header className="text-center py-12 px-4">
+          <h1 className="text-5xl md:text-6xl font-display font-bold text-primary-foreground mb-3 drop-shadow-lg">
             JD Flooring & Cleaning
           </h1>
-          <p className="text-lg text-primary-foreground/80 max-w-md mx-auto drop-shadow">
+          <p className="text-xl text-primary-foreground/80 max-w-md mx-auto drop-shadow mb-6">
             Professional home services with transparent pricing. Get your free estimate in minutes.
           </p>
+          <img src="/LogoJD.JPG" alt="JD Logo" className="h-60 w-auto mx-auto drop-shadow-lg mb-0" style={{ borderRadius: 999 }} />
         </header>
 
-        <main className="flex-1 flex items-start justify-center px-4 pb-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 max-w-2xl w-full">
+        <main className="flex-1 flex items-center justify-stretch px-4 pb-16">
+          <div className="flex gap-0 w-full">
             {services.map(({ key, title, description, icon: Icon, path }) => (
-              <Card
-                key={key}
-                className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 bg-card/90 backdrop-blur-sm"
-                onClick={() => handleChoose(key, path)}
-                onMouseEnter={() => setHovered(key)}
-                onMouseLeave={() => setHovered(null)}
-              >
-                <CardHeader className="text-center space-y-4 p-8">
-                  <div className="mx-auto w-16 h-16 rounded-2xl bg-muted flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
-                    <Icon className="h-8 w-8 text-primary group-hover:text-secondary transition-colors" />
-                  </div>
-                  <CardTitle className="font-display text-xl">{title}</CardTitle>
-                  <CardDescription className="text-sm">{description}</CardDescription>
-                  <Button variant="ghost" className="gap-2">
-                    Get Estimate <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                </CardHeader>
-              </Card>
+              <div key={key} className="flex-1 flex items-center justify-center">
+                <Card
+                  className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 bg-card/90 backdrop-blur-sm w-full max-w-sm"
+                  onClick={() => handleChoose(key, path)}
+                  onMouseEnter={() => setHovered(key)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  <CardHeader className="text-center space-y-4 p-8">
+                    <div className="mx-auto w-16 h-16 rounded-2xl bg-muted flex items-center justify-center group-hover:bg-secondary/20 transition-colors">
+                      <Icon className="h-8 w-8 text-primary group-hover:text-secondary transition-colors" />
+                    </div>
+                    <CardTitle className="font-display text-xl">{title}</CardTitle>
+                    <CardDescription className="text-sm">{description}</CardDescription>
+                    <Button variant="ghost" className="gap-2">
+                      Get Estimate <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  </CardHeader>
+                </Card>
+              </div>
             ))}
           </div>
         </main>

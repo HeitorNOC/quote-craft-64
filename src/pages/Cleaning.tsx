@@ -14,6 +14,7 @@ import SqFtKnowledgeStep from '@/components/SqFtKnowledgeStep';
 import TotalSqFtStep from '@/components/TotalSqFtStep';
 import ScheduleVisitStep from '@/components/ScheduleVisitStep';
 import { calculateCleaningEstimate } from '@/lib/utils';
+import bgCleaning from '@/assets/bg-cleaning.jpg';
 import type { Room, CleaningTypeOption, CoverageType, CleaningFrequency } from '@/types';
 
 const FLAT_FEE = 30;
@@ -164,7 +165,7 @@ const Cleaning = () => {
   if (service !== 'cleaning') return null;
 
   return (
-    <WizardLayout step={c.step} totalSteps={totalSteps} title={getStepTitle()} stepLabels={getStepLabels()} onBack={goBack}>
+    <WizardLayout step={c.step} totalSteps={totalSteps} title={getStepTitle()} stepLabels={getStepLabels()} onBack={goBack} bgImage={bgCleaning}>
       {c.step === 1 && (
         <ContactInfoStep initialValues={c.contact.name ? c.contact : undefined} onSubmit={handleContact} />
       )}

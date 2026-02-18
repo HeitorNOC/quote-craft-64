@@ -13,6 +13,7 @@ import SqFtKnowledgeStep from '@/components/SqFtKnowledgeStep';
 import TotalSqFtStep from '@/components/TotalSqFtStep';
 import ScheduleVisitStep from '@/components/ScheduleVisitStep';
 import { calculateFlooringEstimate } from '@/lib/utils';
+import bgFlooring from '@/assets/bg-flooring.jpg';
 import type { Room, MaterialOption, ManualMaterial, MaterialSource, CoverageType } from '@/types';
 
 const FLAT_FEE = 50;
@@ -167,7 +168,7 @@ const Flooring = () => {
   if (service !== 'flooring') return null;
 
   return (
-    <WizardLayout step={f.step} totalSteps={totalSteps} title={getStepTitle()} stepLabels={getStepLabels()} onBack={goBack}>
+    <WizardLayout step={f.step} totalSteps={totalSteps} title={getStepTitle()} stepLabels={getStepLabels()} onBack={goBack} bgImage={bgFlooring}>
       {f.step === 1 && (
         <ContactInfoStep initialValues={f.contact.name ? f.contact : undefined} onSubmit={handleContact} />
       )}
