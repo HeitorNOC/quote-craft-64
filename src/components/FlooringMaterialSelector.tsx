@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useHomeDepotSearch } from '@/hooks/useHomeDepotSearch';
 import type { MaterialOption, MaterialSource } from '@/types';
@@ -10,6 +11,7 @@ import type { MaterialOption, MaterialSource } from '@/types';
 interface FlooringMaterialSelectorProps {
   onSelect: (material: MaterialOption | null, manual: { name: string; pricePerSqFt: number } | null, source: MaterialSource) => void;
   flooringType?: string;
+  zipCode?: string;
 }
 
 /**
@@ -18,18 +20,19 @@ interface FlooringMaterialSelectorProps {
  * 1. Home Depot Search (via SerpAPI)
  * 2. Manual Input
  */
-export default function FlooringMaterialSelector({ onSelect, flooringType }: FlooringMaterialSelectorProps) {
+export default function FlooringMaterialSelector({ onSelect, flooringType, zipCode }: FlooringMaterialSelectorProps) {
   const [tab, setTab] = useState<'search' | 'manual'>('search');
   const [searchQuery, setSearchQuery] = useState(flooringType || '');
   const [manualName, setManualName] = useState('');
   const [manualPrice, setManualPrice] = useState('');
+  const { toast } = useToast();
 
-  const { results: searchResults, loading: searchLoading, error: searchError, search, requestsRemaining, nextRequestAvailable } = useHomeDepotSearch();
+  const { results: searchResults, loading: searchLoading, error: searchError, search } = useHomeDepotSearch();
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      search(searchQuery);
+      search(searchQuery, zipCode);
     }
   };
 
@@ -38,7 +41,11 @@ export default function FlooringMaterialSelector({ onSelect, flooringType }: Flo
     const price = parseFloat(manualPrice);
 
     if (!manualName.trim() || isNaN(price) || price <= 0) {
-      alert('Please enter a valid name and price');
+      toast({
+        title: 'Invalid input',
+        description: 'Please enter a valid material name and price',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -80,24 +87,14 @@ export default function FlooringMaterialSelector({ onSelect, flooringType }: Flo
                 <Button
                   type="submit"
                   className="bg-blue-600 hover:bg-blue-700"
-                  disabled={searchLoading || !searchQuery.trim() || requestsRemaining <= 0}
+                  disabled={searchLoading || !searchQuery.trim()}
                 >
                   {searchLoading ? 'Searching...' : 'Search'}
                 </Button>
               </div>
-              <div className="flex justify-between items-center mt-2">
-                <p className="text-xs text-gray-500">
-                  💡 Enter the flooring type you're looking for
-                </p>
-                <p className={`text-xs font-medium ${requestsRemaining > 3 ? 'text-green-600' : requestsRemaining > 0 ? 'text-yellow-600' : 'text-red-600'}`}>
-                  {requestsRemaining > 0 
-                    ? `🔄 ${requestsRemaining} searches remaining` 
-                    : nextRequestAvailable
-                    ? `⏸️ Next available in ${nextRequestAvailable.toLocaleTimeString()}`
-                    : '⏸️ Limit reached'
-                  }
-                </p>
-              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                💡 Enter the flooring type you're looking for
+              </p>
             </div>
           </form>
 
@@ -114,25 +111,61 @@ export default function FlooringMaterialSelector({ onSelect, flooringType }: Flo
               <p className="text-sm font-medium text-gray-700">
                 {searchResults.length} results found:
               </p>
-              <div className="grid gap-3">
+              <div className="scrollable-material-list border-2 border-blue-300">
                 {searchResults.map((material) => (
                   <Card
                     key={material.id}
                     className="p-4 cursor-pointer hover:shadow-md hover:bg-blue-50 transition-all"
-                    onClick={() => handleSearchSelect(material)}
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-semibold text-gray-900">{material.name}</p>
-                        <p className="text-xs text-gray-500">Home Depot</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-blue-600">
-                          R$ {material.pricePerSqFt.toFixed(2)}/m²
-                        </p>
-                        <Button size="sm" variant="outline">
-                          Select
-                        </Button>
+                    <div className="flex gap-4">
+                      {/* Product Image */}
+                      {material.image && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={material.image}
+                            alt={material.name}
+                            className="w-24 h-24 object-cover rounded-md"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {/* Product Info */}
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900 line-clamp-2">{material.name}</p>
+                          <p className="text-xs text-gray-500 mt-1">Home Depot</p>
+                        </div>
+
+                        {/* Price and Buttons */}
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="font-bold text-blue-600">
+                            ${material.pricePerSqFt.toFixed(2)}/sq ft
+                          </p>
+
+                          <div className="flex gap-2">
+                            {material.url && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.open(material.url, '_blank')}
+                                className="text-xs"
+                              >
+                                🔗 View at HD
+                              </Button>
+                            )}
+
+                            <Button
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-xs"
+                              onClick={() => handleSearchSelect(material)}
+                            >
+                              Select
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </Card>

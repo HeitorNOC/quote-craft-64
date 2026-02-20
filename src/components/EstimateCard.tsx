@@ -43,9 +43,6 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground">Total area: {totalSqFt.toLocaleString()} sq ft</p>
           <p className="text-sm text-muted-foreground">Rate: {formatCurrency(pricePerSqFt)}/sq ft</p>
-          <p className="text-sm text-muted-foreground">
-            {serviceType === 'flooring' ? 'Visit fee' : 'Service fee'}: {formatCurrency(flatFee)}
-          </p>
           <div className="border-t border-border my-3" />
           <p className="text-4xl font-display font-bold text-foreground">
             {formatCurrency(estimate)}
@@ -56,7 +53,7 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
       <div className="flex items-start gap-2 p-3 rounded-lg bg-brand-warm-light text-sm">
         <AlertTriangle className="h-4 w-4 mt-0.5 text-secondary flex-shrink-0" />
         <p className="text-left text-muted-foreground">
-          This is a preliminary estimate. Final pricing will be confirmed after an on-site visit. Visit fee may vary.
+          This is a preliminary estimate. Final pricing will be confirmed after an on-site visit.
         </p>
       </div>
 

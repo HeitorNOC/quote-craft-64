@@ -6,7 +6,6 @@ import type { Room } from '@/types';
 
 interface ManualRoomFormProps {
   initialRooms?: Room[];
-  zillowTotalSqFt?: number;
   onSubmit: (rooms: Room[]) => void;
 }
 
@@ -14,7 +13,7 @@ interface FormValues {
   rooms: Room[];
 }
 
-const ManualRoomForm = ({ initialRooms, zillowTotalSqFt, onSubmit }: ManualRoomFormProps) => {
+const ManualRoomForm = ({ initialRooms, onSubmit }: ManualRoomFormProps) => {
   const { register, control, handleSubmit, formState: { errors } } = useForm<FormValues>({
     defaultValues: {
       rooms: initialRooms?.length ? initialRooms : [{ name: '', sqFt: 0 }],
@@ -31,11 +30,6 @@ const ManualRoomForm = ({ initialRooms, zillowTotalSqFt, onSubmit }: ManualRoomF
 
   return (
     <form onSubmit={handleSubmit(onValid)} className="space-y-4">
-      {zillowTotalSqFt && zillowTotalSqFt > 0 && (
-        <div className="p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground text-center">
-          Zillow total: <strong>{zillowTotalSqFt.toLocaleString()} sq ft</strong> — break it down into rooms below.
-        </div>
-      )}
       <div className="space-y-3">
         {fields.map((field, index) => (
           <div key={field.id} className="flex items-start gap-2">

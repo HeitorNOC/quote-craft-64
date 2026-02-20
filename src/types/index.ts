@@ -8,6 +8,7 @@ export type MaterialOption = {
   source: MaterialSource;
   pricePerSqFt: number;
   url?: string;
+  image?: string;
 };
 
 export type ManualMaterial = {
@@ -24,16 +25,21 @@ export type CleaningTypeOption = {
 export type ZillowResponse = {
   address: string;
   totalSqFt: number;
+  zipCode?: string;
+  bedrooms?: number;
+  bathrooms?: number;
+  found: boolean;
 };
 
 export type CoverageType = 'whole' | 'specific' | null;
 
-export type CleaningFrequency = 'one-time' | 'weekly' | 'monthly';
+export type CleaningFrequency = 'one-time' | 'monthly';
 
 export type FlooringState = {
   step: number;
   useZillow: boolean | null;
   address: string;
+  zipCode: string;
   totalSqFt: number;
   coverageType: CoverageType;
   knowsSqFt: boolean | null;
@@ -50,6 +56,7 @@ export type CleaningState = {
   step: number;
   useZillow: boolean | null;
   address: string;
+  zipCode: string;
   totalSqFt: number;
   coverageType: CoverageType;
   knowsSqFt: boolean | null;

@@ -5,6 +5,14 @@ interface SerpAPIProduct {
   price?: string | number;
   product_link?: string;
   link?: string;
+  product_image?: string;
+  image?: string;
+  thumbnails?: string[][];
+  rating?: number;
+  reviews?: number;
+  unit?: string;
+  price_was?: string | number;
+  price_saving?: string | number;
 }
 
 interface SerpAPIResponse {
@@ -21,6 +29,7 @@ interface MaterialOption {
   source: 'HomeDepot' | 'Lowes' | 'Manual';
   pricePerSqFt: number;
   url?: string;
+  image?: string;
 }
 
 /**
@@ -43,7 +52,7 @@ export default async function handler(
     return;
   }
 
-  const { query } = req.body;
+  const { query, zipCode } = req.body;
 
   // Input validation
   if (!query || typeof query !== 'string') {
@@ -72,6 +81,8 @@ export default async function handler(
   }
 
   try {
+    console.log('[HomeDepot Search] Query:', cleanQuery, 'ZipCode:', zipCode || 'NOT PROVIDED');
+    
     const url = new URL('https://serpapi.com/search');
     url.searchParams.append('api_key', apiKey);
     url.searchParams.append('engine', 'home_depot');
@@ -79,6 +90,17 @@ export default async function handler(
     url.searchParams.append('num', '3');
     url.searchParams.append('device', 'mobile');
     url.searchParams.append('no_cache', 'false');
+    
+    // Add zip code to search location if provided
+    if (zipCode && zipCode !== 'N/A' && zipCode.trim()) {
+      url.searchParams.append('location', zipCode);
+      console.log('[HomeDepot Search] Location filter applied:', zipCode);
+    } else {
+      console.log('[HomeDepot Search] No location filter (zipCode:', zipCode, ')');
+    }
+
+    console.log('[HomeDepot Search] Full Request URL:', url.toString());
+    console.log('[HomeDepot Search] Calling SerpAPI...');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
@@ -89,9 +111,11 @@ export default async function handler(
 
     clearTimeout(timeoutId);
 
+    console.log('[HomeDepot Search] Response status:', response.status);
+
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`API error (${response.status}):`, errorText);
+      console.error(`[HomeDepot Search] API error (${response.status}):`, errorText);
       
       if (response.status === 401) {
         throw new Error('Authentication failed');
@@ -103,12 +127,16 @@ export default async function handler(
     }
 
     const data: SerpAPIResponse = await response.json();
+    console.log('[HomeDepot Search] Full API Response:', JSON.stringify(data, null, 2));
+    console.log('[HomeDepot Search] Products found:', data.products?.length || 0);
 
     if (data.search_metadata?.status === 'Error' || data.error) {
       throw new Error(data.error || 'Search failed');
     }
 
     if (!data.products || data.products.length === 0) {
+      console.log('[HomeDepot Search] No products returned from API');
+
       res.status(404).json({ 
         error: 'No products found. Try a different search or add manually.' 
       });
@@ -117,30 +145,66 @@ export default async function handler(
 
     // Convert SerpAPI products to MaterialOption
     const materials: MaterialOption[] = data.products.map((product, idx) => {
-      // Handle price as string or number
-      let priceNum = 0;
+      // Use price directly from Home Depot
+      let pricePerSqFt = 3.0; // default fallback
+      
       if (product.price) {
-        const priceStr = String(product.price).replace(/[^0-9.]/g, '');
-        priceNum = parseFloat(priceStr) || 0;
+        const priceNum = Number(product.price);
+        
+        // Extract sq. ft. coverage from title (e.g., "16.12 sq. ft./case")
+        const sqFtMatch = product.title.match(/(\d+\.?\d*)\s*(?:sq\.?\s*f[t\.]*|square\s+feet)/i);
+        const sqFtCoverage = sqFtMatch ? parseFloat(sqFtMatch[1]) : 0;
+        
+        if (sqFtCoverage > 0) {
+          // Case/package: divide price by sq. ft. coverage
+          pricePerSqFt = Math.round((priceNum / sqFtCoverage) * 100) / 100;
+        } else {
+          // Single item: assume it's per sq. ft already or estimate
+          pricePerSqFt = Math.round(priceNum * 100) / 100;
+        }
       }
       
-      const estimatedPricePerSqFt = priceNum > 0 ? Math.max(1, priceNum / 50) : 3.0;
+      // Ensure reasonable price range
+      pricePerSqFt = Math.max(0.5, Math.min(50, pricePerSqFt));
+      
+      // Extract first thumbnail image from SerpAPI thumbnails array
+      let productImage = '';
+      if (product.thumbnails && Array.isArray(product.thumbnails) && product.thumbnails.length > 0) {
+        const firstThumbnailArray = product.thumbnails[0];
+        if (Array.isArray(firstThumbnailArray) && firstThumbnailArray.length > 0) {
+          productImage = firstThumbnailArray[0];
+        }
+      }
+      // Fallback to other image fields if thumbnails not available
+      if (!productImage) {
+        productImage = product.product_image || product.image || '';
+      }
+      
+      let productUrl = product.link || product.product_link || '';
+      // Fix blocked internal API domain
+      if (productUrl.includes('apionline.homedepot.com')) {
+        productUrl = productUrl.replace('apionline.homedepot.com', 'www.homedepot.com');
+      }
+      
+      console.log(`[HomeDepot Search] Product ${idx + 1}: ${product.title.substring(0, 50)}... | Price: $${product.price} | Per SqFt: $${pricePerSqFt} | Image: ${productImage ? 'YES' : 'NO'} | URL: ${productUrl ? 'YES' : 'NO'}`);
 
       return {
         id: `hd-${cleanQuery.replace(/\s+/g, '-')}-${idx}`,
         name: product.title,
         source: 'HomeDepot',
-        pricePerSqFt: Number(estimatedPricePerSqFt.toFixed(2)),
-        url: product.link || product.product_link || '',
+        pricePerSqFt: pricePerSqFt,
+        url: productUrl,
+        image: productImage,
       };
     });
 
+    console.log('[HomeDepot Search] Final Materials Response:', JSON.stringify(materials, null, 2));
     res.status(200).json(materials);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const isAborted = errorMessage.includes('aborted') || errorMessage.includes('Abort') || errorMessage.includes('signal');
     
-    console.error('Search error:', errorMessage);
+    console.error('[HomeDepot Search] Error:', errorMessage);
     
     let userMessage = 'Unable to fetch materials. Please try again or add manually.';
     if (isAborted) {

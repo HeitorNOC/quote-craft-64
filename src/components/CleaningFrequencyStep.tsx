@@ -12,27 +12,15 @@ interface FrequencyOption {
 const OPTIONS: FrequencyOption[] = [
   {
     id: 'one-time',
-    label: 'Uma Vez',
-    description: 'Limpeza única',
+    label: 'One-Time',
+    description: 'Single cleaning service',
     multiplier: 1,
   },
   {
-    id: 'weekly',
-    label: 'Semanal',
-    description: 'Toda semana (desconto 10%)',
-    multiplier: 0.9,
-  },
-  {
-    id: 'biweekly',
-    label: 'Quinzenal',
-    description: 'A cada 2 semanas (desconto 5%)',
-    multiplier: 0.95,
-  },
-  {
     id: 'monthly',
-    label: 'Mensal',
-    description: 'Uma vez por mês (acréscimo 10%)',
-    multiplier: 1.1,
+    label: 'Monthly',
+    description: 'Once per month',
+    multiplier: 1,
   },
 ];
 
@@ -45,8 +33,8 @@ export default function CleaningFrequencyStep({ onSelect, selected }: CleaningFr
   return (
     <div className="w-full max-w-3xl mx-auto space-y-6">
       <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Com que frequência?</h2>
-        <p className="text-gray-600 mt-2">Escolha a periodicidade do serviço</p>
+        <h2 className="text-3xl font-bold text-gray-900">How often do you need cleaning?</h2>
+        <p className="text-gray-600 mt-2">Choose your preferred service frequency</p>
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
@@ -62,11 +50,6 @@ export default function CleaningFrequencyStep({ onSelect, selected }: CleaningFr
           >
             <h3 className="font-semibold text-gray-900">{option.label}</h3>
             <p className="text-sm text-gray-600 mt-1">{option.description}</p>
-            {option.multiplier !== 1 && (
-              <p className="text-xs text-blue-600 mt-2">
-                {option.multiplier < 1 ? '✓' : '+'} {Math.abs((option.multiplier - 1) * 100).toFixed(0)}%
-              </p>
-            )}
           </Card>
         ))}
       </div>
@@ -79,7 +62,7 @@ export default function CleaningFrequencyStep({ onSelect, selected }: CleaningFr
           className="w-full bg-blue-600 hover:bg-blue-700 text-white"
           disabled={!selected}
         >
-          Continuar →
+          Continue
         </Button>
       </div>
     </div>

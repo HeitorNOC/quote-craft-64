@@ -38,7 +38,7 @@ function MyComponent() {
       <button onClick={handleSearch}>Search</button>
       {loading && <p>Carregando...</p>}
       {error && <p>Erro: {error}</p>}
-      {results.map(r => <p key={r.id}>{r.name} - R$ {r.pricePerSqFt}/m²</p>)}
+      {results.map(r => <p key={r.id}>{r.name} - $ {r.pricePerSqFt}/m²</p>)}
     </div>
   );
 }
@@ -82,7 +82,7 @@ interface FlexibleMaterialSelectorProps {
     if (material) {
       console.log(`Selecionado: ${material.name} de ${source}`);
     } else if (manual) {
-      console.log(`Manual: ${manual.name} - R$ ${manual.pricePerSqFt}/m²`);
+      console.log(`Manual: ${manual.name} - $ ${manual.pricePerSqFt}/m²`);
     }
   }}
 />

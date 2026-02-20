@@ -5,7 +5,7 @@ interface UseHomeDepotSearchResult {
   results: MaterialOption[];
   loading: boolean;
   error: string | null;
-  search: (query: string) => Promise<void>;
+  search: (query: string, zipCode?: string) => Promise<void>;
   clear: () => void;
   requestsRemaining: number;
   nextRequestAvailable: Date | null;
@@ -99,7 +99,7 @@ export function useHomeDepotSearch(): UseHomeDepotSearchResult {
     return Date.now() - lastSearch > THROTTLE_INTERVAL;
   };
 
-  const search = useCallback(async (query: string) => {
+  const search = useCallback(async (query: string, zipCode?: string) => {
     if (!query.trim()) {
       setResults([]);
       setError(null);
@@ -157,7 +157,7 @@ export function useHomeDepotSearch(): UseHomeDepotSearchResult {
           const apiResponse = await fetch('/api/search-flooring', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query: normalizedQuery }),
+            body: JSON.stringify({ query: normalizedQuery, zipCode }),
             signal: controller.signal,
           });
 

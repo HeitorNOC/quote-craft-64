@@ -3,6 +3,7 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useHomeDepotSearch } from '@/hooks/useHomeDepotSearch';
 import { fetchHomeDepotMaterials } from '@/lib/api';
@@ -11,6 +12,7 @@ import type { MaterialOption, MaterialSource } from '@/types';
 interface FlexibleMaterialSelectorProps {
   onSelect: (material: MaterialOption | null, manual: { name: string; pricePerSqFt: number } | null, source: MaterialSource | 'Manual') => void;
   flooringType?: string;
+  zipCode?: string;
 }
 
 /**
@@ -19,13 +21,14 @@ interface FlexibleMaterialSelectorProps {
  * 2. Manual Input
  * 3. Suggested Materials
  */
-export default function FlexibleMaterialSelector({ onSelect, flooringType }: FlexibleMaterialSelectorProps) {
+export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCode }: FlexibleMaterialSelectorProps) {
   const [tab, setTab] = useState<'search' | 'manual' | 'suggestions'>('search');
   const [searchQuery, setSearchQuery] = useState(flooringType || '');
   const [manualName, setManualName] = useState('');
   const [manualPrice, setManualPrice] = useState('');
   const [suggestions, setSuggestions] = useState<MaterialOption[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const { toast } = useToast();
 
   const { results: searchResults, loading: searchLoading, error: searchError, search } = useHomeDepotSearch();
 
@@ -46,7 +49,7 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType }: Fle
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      search(searchQuery);
+      search(searchQuery, zipCode);
     }
   };
 
@@ -55,7 +58,11 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType }: Fle
     const price = parseFloat(manualPrice);
 
     if (!manualName.trim() || isNaN(price) || price <= 0) {
-      alert('Please enter a valid name and price');
+      toast({
+        title: 'Invalid input',
+        description: 'Please enter a valid material name and price',
+        variant: 'destructive',
+      });
       return;
     }
 
@@ -126,25 +133,61 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType }: Fle
               <p className="text-sm font-medium text-gray-700">
                 {searchResults.length} results found:
               </p>
-              <div className="grid gap-3">
+              <div className="scrollable-material-list border-2 border-blue-300">
                 {searchResults.map((material) => (
                   <Card
                     key={material.id}
                     className="p-4 cursor-pointer hover:shadow-md hover:bg-blue-50 transition-all"
-                    onClick={() => handleSearchSelect(material)}
                   >
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <p className="font-semibold text-gray-900">{material.name}</p>
-                        <p className="text-xs text-gray-500">Home Depot</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="font-bold text-blue-600">
-                          R$ {material.pricePerSqFt.toFixed(2)}/m²
-                        </p>
-                        <Button size="sm" variant="outline">
-                          Select
-                        </Button>
+                    <div className="flex gap-4">
+                      {/* Product Image */}
+                      {material.image && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={material.image}
+                            alt={material.name}
+                            className="w-24 h-24 object-cover rounded-md"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {/* Product Info */}
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900 line-clamp-2">{material.name}</p>
+                          <p className="text-xs text-gray-500 mt-1">Home Depot</p>
+                        </div>
+
+                        {/* Price and Buttons */}
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="font-bold text-blue-600">
+                            ${material.pricePerSqFt.toFixed(2)}/sq ft
+                          </p>
+
+                          <div className="flex gap-2">
+                            {material.url && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.open(material.url, '_blank')}
+                                className="text-xs"
+                              >
+                                🔗 View at HD
+                              </Button>
+                            )}
+
+                            <Button
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-xs"
+                              onClick={() => handleSearchSelect(material)}
+                            >
+                              Select
+                            </Button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </Card>
@@ -204,30 +247,68 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType }: Fle
           {suggestionsLoading && <LoadingSpinner text="Loading suggestions..." />}
 
           {suggestions.length > 0 && (
-            <div className="grid gap-3">
+            <div className="space-y-2">
               <p className="text-sm font-medium text-gray-700">Suggested Materials:</p>
-              {suggestions.map((material) => (
-                <Card
-                  key={material.id}
-                  className="p-4 cursor-pointer hover:shadow-md hover:bg-blue-50 transition-all"
-                  onClick={() => handleSuggestionSelect(material)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div>
-                      <p className="font-semibold text-gray-900">{material.name}</p>
-                      <p className="text-xs text-gray-500">{material.source}</p>
+              <div className="scrollable-material-list border-2 border-green-300">
+                {suggestions.map((material) => (
+                  <Card
+                    key={material.id}
+                    className="p-4 cursor-pointer hover:shadow-md hover:bg-green-50 transition-all"
+                  >
+                    <div className="flex gap-4">
+                      {/* Product Image */}
+                      {material.image && (
+                        <div className="flex-shrink-0">
+                          <img
+                            src={material.image}
+                            alt={material.name}
+                            className="w-24 h-24 object-cover rounded-md"
+                            onError={(e) => {
+                              e.currentTarget.style.display = 'none';
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {/* Product Info */}
+                      <div className="flex-1 flex flex-col justify-between">
+                        <div>
+                          <p className="font-semibold text-gray-900 line-clamp-2">{material.name}</p>
+                          <p className="text-xs text-gray-500 mt-1">{material.source}</p>
+                        </div>
+
+                        {/* Price and Buttons */}
+                        <div className="flex items-center justify-between mt-3">
+                          <p className="font-bold text-blue-600">
+                            ${material.pricePerSqFt.toFixed(2)}/sq ft
+                          </p>
+
+                          <div className="flex gap-2">
+                            {material.url && (
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                onClick={() => window.open(material.url, '_blank')}
+                                className="text-xs"
+                              >
+                                🔗 View
+                              </Button>
+                            )}
+
+                            <Button
+                              size="sm"
+                              className="bg-blue-600 hover:bg-blue-700 text-xs"
+                              onClick={() => handleSuggestionSelect(material)}
+                            >
+                              Select
+                            </Button>
+                          </div>
+                        </div>
+                      </div>
                     </div>
-                    <div className="text-right">
-                      <p className="font-bold text-blue-600">
-                        R$ {material.pricePerSqFt.toFixed(2)}/m²
-                      </p>
-                      <Button size="sm" variant="outline">
-                        Select
-                      </Button>
-                    </div>
-                  </div>
-                </Card>
-              ))}
+                  </Card>
+                ))}
+              </div>
             </div>
           )}
         </TabsContent>

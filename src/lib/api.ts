@@ -1,22 +1,38 @@
 import type { ZillowResponse, MaterialOption, CleaningTypeOption } from '@/types';
 
 // ---------------------------------------------------------------------------
-// 1️⃣ Zillow – mock
-// TODO: Replace with a real property data API. Options:
-//   - ZenRows Zillow API: https://realestate.api.zenrows.com/v1/targets/zillow/properties/{zpid}
-//     Requires: ZENROWS_API_KEY (paid). Returns living area, lot size, bedrooms, etc.
-//   - Apify Zillow Scraper: https://apify.com/zillowscraper/zillow-property-details
-//     Requires: APIFY_API_TOKEN (paid). Accepts ZUID or URL.
-//   - Zillow does NOT have a free public API. All options require third-party services.
-//   - Note: Zillow provides total sq ft only, NOT individual room breakdowns.
+// 1️⃣ Zillow – Property data via SerpAPI
+// API Key: stored in .env.local as VITE_SERPAPI_API_KEY
+// Docs: https://serpapi.com/docs/zillow_search_api
+//
+// Returns: address, zip code, square feet, bedrooms, bathrooms
 // ---------------------------------------------------------------------------
 export async function fetchZillowData(address: string): Promise<ZillowResponse> {
-  await new Promise(r => setTimeout(r, 800));
-  if (Math.random() < 0.1) throw new Error('Failed to fetch property data');
-  return {
-    address,
-    totalSqFt: 2100,
-  };
+  try {
+    const response = await fetch('/api/search-zillow', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ address })
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Unable to fetch property data');
+    }
+
+    return await response.json();
+  } catch {
+    // Fallback when API fails: extract zip from address if possible
+    // US zip codes appear at the end of the address
+    const zipMatch = address.match(/\s(\d{5}(?:-\d{4})?)$/);
+    const zipCode = zipMatch ? zipMatch[1] : '';
+    return {
+      address,
+      totalSqFt: 0,
+      zipCode,
+      found: false,
+    };
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -48,14 +64,17 @@ interface SerpAPIResponse {
  * - Enforces query length limits
  * - Adds request timeout
  * - Falls back gracefully on error
+ * - Optional: filter by zipCode location
  */
-export async function searchHomeDepotProducts(query: string): Promise<MaterialOption[]> {
+export async function searchHomeDepotProducts(query: string, zipCode?: string): Promise<MaterialOption[]> {
   // Input validation - prevent abuse
   if (!query || typeof query !== 'string') {
+    console.error('[HomeDepot API] Invalid search query:', query);
     throw new Error('Invalid search query');
   }
 
   const cleanQuery = query.trim();
+  console.log('[HomeDepot API] Searching for:', cleanQuery, 'ZIP:', zipCode || 'N/A');
   
   // Limit query length (prevent large payload attacks)
   if (cleanQuery.length > 100) {
@@ -69,15 +88,17 @@ export async function searchHomeDepotProducts(query: string): Promise<MaterialOp
 
   const apiKey = import.meta.env.VITE_SERPAPI_API_KEY;
 
-  if (!apiKey) {
-    return getFallbackMaterials(cleanQuery);
-  }
-
   try {
+    console.log('[HomeDepot API] Making request to SerpAPI...');
     const url = new URL('https://serpapi.com/search');
     url.searchParams.append('api_key', apiKey);
     url.searchParams.append('engine', 'home_depot_product_search');
     url.searchParams.append('q', cleanQuery);
+    if (zipCode) {
+      // SerpAPI Home Depot engine accepts location/zip for local results
+      console.log('[HomeDepot API] Including location:', zipCode);
+      url.searchParams.append('location', zipCode);
+    }
     url.searchParams.append('num', '6');
 
     // Request with timeout (10 seconds)
@@ -87,17 +108,23 @@ export async function searchHomeDepotProducts(query: string): Promise<MaterialOp
     const response = await fetch(url.toString(), { signal: controller.signal });
     clearTimeout(timeoutId);
 
+    console.log('[HomeDepot API] Response status:', response.status);
+
     if (!response.ok) {
+      console.error('[HomeDepot API] SerpAPI error:', response.status);
       throw new Error(`SerpAPI error: ${response.status}`);
     }
 
     const data: SerpAPIResponse = await response.json();
+    console.log('[HomeDepot API] Received products:', data.products?.length || 0);
 
     if (data.error) {
+      console.error('[HomeDepot API] API returned error:', data.error);
       throw new Error(data.error);
     }
 
     if (!data.products || data.products.length === 0) {
+      console.log('[HomeDepot API] No products found, using fallback');
       return getFallbackMaterials(cleanQuery);
     }
 
@@ -116,6 +143,9 @@ export async function searchHomeDepotProducts(query: string): Promise<MaterialOp
       };
     });
   } catch (error) {
+    const errorMsg = error instanceof Error ? error.message : String(error);
+    console.error('[HomeDepot API] Search failed:', errorMsg);
+    console.log('[HomeDepot API] Using fallback materials');
     return getFallbackMaterials(cleanQuery);
   }
 }
@@ -220,8 +250,8 @@ export async function fetchLowesMaterials(): Promise<MaterialOption[]> {
 export async function fetchCleaningTypes(): Promise<CleaningTypeOption[]> {
   await new Promise(r => setTimeout(r, 400));
   return [
-    { id: 'standard', name: 'Standard Clean (weekly)', pricePerSqFt: 0.12 },
-    { id: 'deep', name: 'Deep Clean (bi-annual)', pricePerSqFt: 0.20 },
+    { id: 'standard', name: 'Standard Clean', pricePerSqFt: 0.12 },
+    { id: 'deep', name: 'Deep Clean', pricePerSqFt: 0.20 },
     { id: 'moveout', name: 'Move-out Clean', pricePerSqFt: 0.25 },
     { id: 'airbnb', name: 'Airbnb Turn-over', pricePerSqFt: 0.18 },
   ];

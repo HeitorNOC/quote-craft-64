@@ -31,8 +31,8 @@ const WizardLayout = ({ step, totalSteps = 6, title, subtitle, stepLabels, onBac
             <div className="mb-6">
               <div className="flex items-center gap-3 mb-4">
                 {onBack && (
-                  <Button variant="ghost" size="icon" onClick={onBack} aria-label="Go back" className="text-primary-foreground hover:bg-primary-foreground/20">
-                    <ArrowLeft className="h-5 w-5" />
+                  <Button variant="outline" size="lg" onClick={onBack} aria-label="Go back" className="h-12 w-12 flex-shrink-0 flex items-center justify-center border-2">
+                    <ArrowLeft className="h-6 w-6" />
                   </Button>
                 )}
                 <div>
