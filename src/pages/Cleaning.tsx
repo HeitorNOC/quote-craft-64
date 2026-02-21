@@ -120,19 +120,16 @@ const Cleaning = () => {
   const handleCleaningSelect = useCallback((type: CleaningTypeOption) => {
     // Validate zipCode
     if (!c.zipCode || c.zipCode.trim() === '') {
-      console.error('Zip code is required for estimate');
       return;
     }
 
     // Validate coverage-specific requirements
     if (c.coverageType === 'whole') {
       if (!c.totalSqFt || c.totalSqFt <= 0) {
-        console.error('Valid property square footage is required for estimate');
         return;
       }
     } else {
       if (c.selectedRooms.length === 0) {
-        console.error('At least one area must be selected');
         return;
       }
     }

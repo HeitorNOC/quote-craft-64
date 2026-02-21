@@ -116,19 +116,16 @@ const Flooring = () => {
   const handleMaterialSelect = useCallback((material: MaterialOption | null, manual: ManualMaterial | null, source: MaterialSource) => {
     // Validate zipCode
     if (!f.zipCode || f.zipCode.trim() === '') {
-      console.error('Zip code is required for estimate');
       return;
     }
 
     // Validate coverage-specific requirements
     if (f.coverageType === 'whole') {
       if (!f.totalSqFt || f.totalSqFt <= 0) {
-        console.error('Valid property square footage is required for estimate');
         return;
       }
     } else {
       if (f.selectedRooms.length === 0) {
-        console.error('At least one area must be selected');
         return;
       }
     }

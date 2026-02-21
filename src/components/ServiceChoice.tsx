@@ -59,6 +59,19 @@ const ServiceChoice = () => {
       {/* Dark overlay for readability */}
       <div className="absolute inset-0 bg-foreground/60" />
 
+      {/* Top Navigation Links */}
+      <div className="relative z-20 px-4 py-4 flex justify-between gap-4">
+        <Button variant="ghost" onClick={() => navigate('/about')} className="text-lg text-primary-foreground hover:bg-primary-foreground/20 font-semibold">
+          About
+        </Button>
+        <Button variant="ghost" onClick={() => navigate('/portfolio')} className="text-lg text-primary-foreground hover:bg-primary-foreground/20 font-semibold">
+          Portfolio
+        </Button>
+        <Button variant="ghost" onClick={() => navigate('/contact')} className="text-lg text-primary-foreground hover:bg-primary-foreground/20 font-semibold">
+          Contact
+        </Button>
+      </div>
+
       {/* Content */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <header className="text-center py-12 px-4">
