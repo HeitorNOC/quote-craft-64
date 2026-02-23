@@ -18,7 +18,8 @@ import type { Room, CleaningTypeOption, CoverageType, CleaningFrequency } from '
 
 const FLAT_FEE = 30;
 
-/*
+const Cleaning = () => {
+  /*
   Complete Flow with validations (Zillow removed - using manual details):
   1. Contact → 2. PropertyDetails → 3. Frequency → 4. Coverage → ...
   Path A (Whole house): 4→5.Type→6.Estimate (6 steps)
@@ -27,7 +28,7 @@ const FLAT_FEE = 30;
   
   // COMMENTED: Zillow integration removed in favor of manual property details
   // Previous flow: 1.Contact → 2.Zillow → 3.PropertyDetails → 4.Frequency → 5.Coverage → ...
-*/
+  */
   const navigate = useNavigate();
   const service = useServiceStore(s => s.service);
   const c = useServiceStore(s => s.cleaning);
