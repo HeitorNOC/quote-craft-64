@@ -2,7 +2,7 @@ import type { ZillowResponse, MaterialOption, CleaningTypeOption } from '@/types
 
 // ---------------------------------------------------------------------------
 // 1️⃣ Zillow – Property data via SerpAPI
-// API Key: stored in .env.local as VITE_SERPAPI_API_KEY
+// API Key: stored in .env.local as SERPAPI_API_KEY
 // Docs: https://serpapi.com/docs/zillow_search_api
 //
 // Returns: address, zip code, square feet, bedrooms, bathrooms
@@ -37,7 +37,7 @@ export async function fetchZillowData(address: string): Promise<ZillowResponse> 
 
 // ---------------------------------------------------------------------------
 // 2️⃣ Home Depot materials – SerpAPI integration
-// API Key: stored in .env.local as VITE_SERPAPI_API_KEY
+// API Key: stored in .env.local as SERPAPI_API_KEY
 // Docs: https://serpapi.com/docs/home_depot_product_search
 //
 // SECURITY: Rate limiting implemented at:
@@ -84,7 +84,7 @@ export async function searchHomeDepotProducts(query: string, zipCode?: string): 
     throw new Error('Invalid characters in search');
   }
 
-  const apiKey = import.meta.env.VITE_SERPAPI_API_KEY;
+  const apiKey = import.meta.env.SERPAPI_API_KEY;
 
   try {
     const url = new URL('https://serpapi.com/search');

@@ -95,7 +95,7 @@ interface FlexibleMaterialSelectorProps {
 Crie um arquivo `.env.local` na raiz do projeto:
 
 ```env
-VITE_SERPAPI_API_KEY=sua_chave_api_aqui
+SERPAPI_API_KEY=sua_chave_api_aqui
 ```
 
 **Como obter a chave:**
@@ -193,7 +193,7 @@ type ManualMaterial = {
 ## Troubleshooting
 
 ### "API Key not found"
-**Solução:** Crie `.env.local` com `VITE_SERPAPI_API_KEY`
+**Solução:** Crie `.env.local` com `SERPAPI_API_KEY`
 
 ### "Nenhum resultado encontrado"
 **Possíveis causas:**
@@ -238,4 +238,4 @@ Para dúvidas sobre a integração:
 
 **Status:** ✅ Implementado e Testado
 **Build:** ✅ Compila sem erros
-**Teste:** ⚠️ Aguarda VITE_SERPAPI_API_KEY para testes E2E
+**Teste:** ⚠️ Aguarda SERPAPI_API_KEY para testes E2E

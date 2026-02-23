@@ -37,7 +37,7 @@ function MyFlooringStep() {
 Crie `.env.local` na raiz do projeto:
 
 ```env
-VITE_SERPAPI_API_KEY=sua_chave_aqui
+SERPAPI_API_KEY=sua_chave_aqui
 ```
 
 **Sem a chave:** App retorna aviso, mas continua funcionando (force Manual)
