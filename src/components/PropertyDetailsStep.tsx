@@ -54,22 +54,23 @@ const PropertyDetailsStep = ({
   return (
     <div className="space-y-6">
       <div className="text-center space-y-2">
-        <h2 className="text-lg font-semibold">Property Details</h2>
-        <p className="text-sm text-muted-foreground">
+        <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">Property Details</h2>
+        <p className="text-xs sm:text-sm text-muted-foreground px-2">
           {isPreFilled 
             ? 'We found your property info. Please verify the details below.' 
             : 'Please enter your property details.'}
         </p>
       </div>
 
-      <Card className="p-6 space-y-4 bg-card/50">
+      <Card className="p-4 sm:p-5 md:p-6 space-y-3 sm:space-y-4 bg-card/50">
         <div>
-          <label className="block text-sm font-medium mb-2">Address</label>
+          <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Address</label>
           <Input
             type="text"
             placeholder="e.g., 123 Main St, Austin, TX 78701"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
+            className="text-xs sm:text-sm"
           />
           <p className="text-xs text-muted-foreground mt-1">
             Your property address
@@ -77,13 +78,14 @@ const PropertyDetailsStep = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Zip Code</label>
+          <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Zip Code</label>
           <Input
             type="text"
             placeholder="e.g., 78701 or 78701-1234"
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value)}
             maxLength={10}
+            className="text-xs sm:text-sm"
           />
           <p className="text-xs text-muted-foreground mt-1">
             Used to find your nearest Home Depot location
@@ -91,13 +93,14 @@ const PropertyDetailsStep = ({
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-2">Total Square Footage</label>
+          <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Total Square Footage</label>
           <Input
             type="number"
             placeholder="e.g., 2500"
             value={sqFt}
             onChange={(e) => setSqFt(e.target.value)}
             min="100"
+            className="text-xs sm:text-sm"
             step="1"
           />
           <p className="text-xs text-muted-foreground mt-1">

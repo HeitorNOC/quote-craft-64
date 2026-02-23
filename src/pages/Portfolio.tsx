@@ -65,8 +65,8 @@ const Portfolio = () => {
 
   return (
     <div className="relative h-screen w-screen bg-background flex flex-col overflow-hidden">
-      {/* Dual Background */}
-      <div className="absolute inset-0 flex">
+      {/* Dual Background - hidden on mobile */}
+      <div className="absolute inset-0 flex hidden md:flex">
         <div 
           className="w-1/2 bg-cover bg-center" 
           style={{ backgroundImage: `url(${bgFlooring})` }} 
@@ -76,6 +76,8 @@ const Portfolio = () => {
           style={{ backgroundImage: `url(${bgCleaning})` }} 
         />
       </div>
+      {/* Mobile background */}
+      <div className="absolute inset-0 md:hidden bg-cover bg-center" style={{ backgroundImage: `url(${bgFlooring})` }} />
       
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/45 to-black/50" />

@@ -41,32 +41,32 @@ const ScheduleVisitStep = ({ serviceType, contact, address, zipCode, coverageTyp
   };
 
   return (
-    <div className="space-y-6 text-center">
-      <CalendarCheck className="h-12 w-12 mx-auto text-primary" />
-      <h2 className="text-xl font-display font-bold">Schedule a Measurement Visit</h2>
+    <div className="space-y-4 sm:space-y-6 text-center">
+      <CalendarCheck className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-primary flex-shrink-0" />
+      <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">Schedule a Measurement Visit</h2>
 
-      <Card className="p-6 bg-muted/30 text-left space-y-3">
-        <p className="text-sm text-muted-foreground">
+      <Card className="p-4 sm:p-5 md:p-6 bg-muted/30 text-left space-y-2 sm:space-y-3">
+        <p className="text-xs sm:text-sm text-muted-foreground">
           Since we don't have the room measurements, we'll need to schedule an on-site visit to measure your space and provide an accurate estimate.
         </p>
-        <div className="border-t border-border pt-3 space-y-1">
-          <p className="text-sm"><strong>Name:</strong> {contact.name}</p>
-          <p className="text-sm"><strong>Email:</strong> {contact.email}</p>
-          <p className="text-sm"><strong>Phone:</strong> {contact.phone}</p>
-          {address && <p className="text-sm"><strong>Address:</strong> {address}</p>}
-          <p className="text-sm"><strong>Service:</strong> {serviceType === 'flooring' ? 'Flooring' : 'Cleaning'}</p>
-          <p className="text-sm"><strong>Coverage:</strong> Specific rooms (measurements needed)</p>
+        <div className="border-t border-border pt-2 sm:pt-3 space-y-0.5 sm:space-y-1">
+          <p className="text-xs sm:text-sm"><strong>Name:</strong> {contact.name}</p>
+          <p className="text-xs sm:text-sm"><strong>Email:</strong> {contact.email}</p>
+          <p className="text-xs sm:text-sm"><strong>Phone:</strong> {contact.phone}</p>
+          {address && <p className="text-xs sm:text-sm"><strong>Address:</strong> {address}</p>}
+          <p className="text-xs sm:text-sm"><strong>Service:</strong> {serviceType === 'flooring' ? 'Flooring' : 'Cleaning'}</p>
+          <p className="text-xs sm:text-sm"><strong>Coverage:</strong> Specific rooms (measurements needed)</p>
         </div>
       </Card>
 
-      <div className="flex items-start gap-2 p-3 rounded-lg bg-muted/50 text-sm">
+      <div className="flex items-start gap-2 p-2.5 sm:p-3 rounded-lg bg-muted/50 text-xs sm:text-sm">
         <AlertTriangle className="h-4 w-4 mt-0.5 text-secondary flex-shrink-0" />
         <p className="text-left text-muted-foreground">
           There's no charge for the measurement visit. We'll provide your estimate after taking measurements on-site.
         </p>
       </div>
 
-      <Button size="lg" className="w-full" onClick={handleSubmit} disabled={submitting}>
+      <Button size="lg" className="w-full text-xs sm:text-sm" onClick={handleSubmit} disabled={submitting}>
         {submitting ? <LoadingSpinner text="Submitting..." /> : 'Request Measurement Visit'}
       </Button>
     </div>
