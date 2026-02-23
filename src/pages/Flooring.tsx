@@ -7,13 +7,14 @@ import ZillowFetcher from '@/components/ZillowFetcher';
 import PropertyDetailsStep from '@/components/PropertyDetailsStep';
 import RoomManagementStep from '@/components/RoomManagementStep';
 import FlooringMaterialSelector from '@/components/FlooringMaterialSelector';
+import { RoomMaterialSelector } from '@/components/RoomMaterialSelector';
 import EstimateCard from '@/components/EstimateCard';
 import CoverageChoiceStep from '@/components/CoverageChoiceStep';
 import SqFtKnowledgeStep from '@/components/SqFtKnowledgeStep';
 import ScheduleVisitStep from '@/components/ScheduleVisitStep';
 import { calculateFlooringEstimate } from '@/lib/utils';
 import bgFlooring from '@/assets/bg-flooring.jpg';
-import type { Room, MaterialOption, ManualMaterial, MaterialSource, CoverageType } from '@/types';
+import type { Room, MaterialOption, ManualMaterial, MaterialSource, CoverageType, RoomMaterial } from '@/types';
 
 const FLAT_FEE = 50;
 
@@ -42,6 +43,7 @@ const Flooring = () => {
   const setMaterial = useServiceStore(s => s.setFlooringMaterial);
   const setManualMaterial = useServiceStore(s => s.setFlooringManualMaterial);
   const setMaterialSource = useServiceStore(s => s.setFlooringMaterialSource);
+  const setRoomMaterials = useServiceStore(s => s.setFlooringRoomMaterials);
   const setEstimate = useServiceStore(s => s.setFlooringEstimate);
   const resetAll = useServiceStore(s => s.resetAll);
 
@@ -111,6 +113,12 @@ const Flooring = () => {
     setSelectedRooms(selectedRooms);
     setStep(7);
   }, [setManualRooms, setSelectedRooms, setStep]);
+
+  const handleRoomMaterials = useCallback((roomMaterials: RoomMaterial[], totalCost: number) => {
+    setRoomMaterials(roomMaterials);
+    setEstimate(totalCost + FLAT_FEE);
+    setStep(8);
+  }, [setRoomMaterials, setEstimate, setStep]);
 
   // MaterialSelector uses (material, manualMaterial, source) signature
   const handleMaterialSelect = useCallback((material: MaterialOption | null, manual: ManualMaterial | null, source: MaterialSource) => {
@@ -223,7 +231,7 @@ const Flooring = () => {
         <FlooringMaterialSelector onSelect={handleMaterialSelect} zipCode={f.zipCode} />
       )}
       {f.step === 6 && f.coverageType === 'whole' && f.estimate !== null && (
-        <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} onSchedule={handleEstimateSubmit} />
+        <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} address={f.address} zipCode={f.zipCode} coverage="whole" material={f.material?.name} onSchedule={handleEstimateSubmit} />
       )}
 
       {/* Specific rooms path */}
@@ -234,13 +242,18 @@ const Flooring = () => {
         <RoomManagementStep initialRooms={f.rooms.length ? f.rooms : undefined} initialSelectedRooms={f.selectedRooms} onSubmit={handleRoomManagement} />
       )}
       {f.step === 6 && f.coverageType === 'specific' && f.knowsSqFt === false && (
-        <ScheduleVisitStep serviceType="flooring" contact={f.contact} address={f.address} coverageType="specific" onDone={handleScheduleDone} />
+        <ScheduleVisitStep serviceType="flooring" contact={f.contact} address={f.address} zipCode={f.zipCode} coverageType="specific" onDone={handleScheduleDone} />
       )}
       {f.step === 7 && f.coverageType === 'specific' && (
-        <FlooringMaterialSelector onSelect={handleMaterialSelect} zipCode={f.zipCode} />
+        <RoomMaterialSelector
+          rooms={f.rooms}
+          selectedRooms={f.selectedRooms}
+          zipCode={f.zipCode}
+          onComplete={handleRoomMaterials}
+        />
       )}
       {f.step === 8 && f.coverageType === 'specific' && f.estimate !== null && (
-        <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} onSchedule={handleEstimateSubmit} />
+        <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} address={f.address} zipCode={f.zipCode} coverage="specific" material={f.material?.name} roomMaterials={f.roomMaterials} onSchedule={handleEstimateSubmit} />
       )}
     </WizardLayout>
   );

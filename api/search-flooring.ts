@@ -81,8 +81,6 @@ export default async function handler(
   }
 
   try {
-    console.log('[HomeDepot Search] Query:', cleanQuery, 'ZipCode:', zipCode || 'NOT PROVIDED');
-    
     const url = new URL('https://serpapi.com/search');
     url.searchParams.append('api_key', apiKey);
     url.searchParams.append('engine', 'home_depot');
@@ -94,13 +92,7 @@ export default async function handler(
     // Add zip code to search location if provided
     if (zipCode && zipCode !== 'N/A' && zipCode.trim()) {
       url.searchParams.append('location', zipCode);
-      console.log('[HomeDepot Search] Location filter applied:', zipCode);
-    } else {
-      console.log('[HomeDepot Search] No location filter (zipCode:', zipCode, ')');
     }
-
-    console.log('[HomeDepot Search] Full Request URL:', url.toString());
-    console.log('[HomeDepot Search] Calling SerpAPI...');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000);
@@ -111,11 +103,8 @@ export default async function handler(
 
     clearTimeout(timeoutId);
 
-    console.log('[HomeDepot Search] Response status:', response.status);
-
     if (!response.ok) {
       const errorText = await response.text();
-      console.error(`[HomeDepot Search] API error (${response.status}):`, errorText);
       
       if (response.status === 401) {
         throw new Error('Authentication failed');
@@ -127,16 +116,12 @@ export default async function handler(
     }
 
     const data: SerpAPIResponse = await response.json();
-    console.log('[HomeDepot Search] Full API Response:', JSON.stringify(data, null, 2));
-    console.log('[HomeDepot Search] Products found:', data.products?.length || 0);
 
     if (data.search_metadata?.status === 'Error' || data.error) {
       throw new Error(data.error || 'Search failed');
     }
 
     if (!data.products || data.products.length === 0) {
-      console.log('[HomeDepot Search] No products returned from API');
-
       res.status(404).json({ 
         error: 'No products found. Try a different search or add manually.' 
       });
@@ -185,8 +170,6 @@ export default async function handler(
       if (productUrl.includes('apionline.homedepot.com')) {
         productUrl = productUrl.replace('apionline.homedepot.com', 'www.homedepot.com');
       }
-      
-      console.log(`[HomeDepot Search] Product ${idx + 1}: ${product.title.substring(0, 50)}... | Price: $${product.price} | Per SqFt: $${pricePerSqFt} | Image: ${productImage ? 'YES' : 'NO'} | URL: ${productUrl ? 'YES' : 'NO'}`);
 
       return {
         id: `hd-${cleanQuery.replace(/\s+/g, '-')}-${idx}`,
@@ -198,13 +181,10 @@ export default async function handler(
       };
     });
 
-    console.log('[HomeDepot Search] Final Materials Response:', JSON.stringify(materials, null, 2));
     res.status(200).json(materials);
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     const isAborted = errorMessage.includes('aborted') || errorMessage.includes('Abort') || errorMessage.includes('signal');
-    
-    console.error('[HomeDepot Search] Error:', errorMessage);
     
     let userMessage = 'Unable to fetch materials. Please try again or add manually.';
     if (isAborted) {

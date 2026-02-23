@@ -147,10 +147,10 @@
     scrollbar-color: #3b82f6 #f3f4f6;
   }
 
-  /* Custom scrollable container with visible scrollbar */
+  /* Custom scrollable container with visible scrollbar - only when needed */
   .scrollable-material-list {
-    height: 384px;
-    overflow-y: scroll;
+    max-height: 350px;
+    overflow-y: auto;
     overflow-x: hidden;
     background-color: #f9fafb;
     border-radius: 0.5rem;
@@ -161,22 +161,19 @@
   }
 
   .scrollable-material-list::-webkit-scrollbar {
-    width: 14px;
+    width: 10px;
   }
 
   .scrollable-material-list::-webkit-scrollbar-track {
-    background: #f3f4f6;
-    border-radius: 10px;
+    background: transparent;
   }
 
   .scrollable-material-list::-webkit-scrollbar-thumb {
-    background: #2563eb;
-    border-radius: 10px;
-    border: 2px solid #f3f4f6;
-    min-height: 40px;
+    background: #3b82f6;
+    border-radius: 5px;
   }
 
   .scrollable-material-list::-webkit-scrollbar-thumb:hover {
-    background: #1d4ed8;
+    background: #2563eb;
   }
 }

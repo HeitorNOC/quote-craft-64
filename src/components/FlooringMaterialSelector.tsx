@@ -57,10 +57,10 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Choose Your Material</h2>
-        <p className="text-gray-600 mt-2">Search Home Depot or enter manually</p>
+    <div className="w-full max-w-2xl mx-auto space-y-3">
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-bold text-gray-900">Choose Your Material</h2>
+        <p className="text-sm text-gray-600 mt-1">Search Home Depot or enter manually</p>
       </div>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
@@ -70,10 +70,10 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
         </TabsList>
 
         {/* Tab 1: Search Home Depot */}
-        <TabsContent value="search" className="space-y-4">
-          <form onSubmit={handleSearch} className="space-y-4">
+        <TabsContent value="search" className="space-y-3">
+          <form onSubmit={handleSearch} className="space-y-2">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-1">
                 Search Home Depot
               </label>
               <div className="flex gap-2">
@@ -92,7 +92,7 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
                   {searchLoading ? 'Searching...' : 'Search'}
                 </Button>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
+              <p className="text-xs text-gray-500 mt-1">
                 💡 Enter the flooring type you're looking for
               </p>
             </div>
@@ -108,10 +108,10 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
 
           {searchResults.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-xs font-medium text-gray-700">
                 {searchResults.length} results found:
               </p>
-              <div className="scrollable-material-list border-2 border-blue-300">
+              <div className="scrollable-material-list border border-blue-200">
                 {searchResults.map((material) => (
                   <Card
                     key={material.id}
@@ -174,18 +174,14 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
             </div>
           )}
 
-          {!searchLoading && searchResults.length === 0 && searchQuery && !searchError && (
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-              No results found. Try another search term or use the "Manual" tab.
-            </div>
-          )}
+
         </TabsContent>
 
         {/* Tab 2: Manual Input */}
-        <TabsContent value="manual" className="space-y-4">
-          <form onSubmit={handleManualSubmit} className="space-y-4">
+        <TabsContent value="manual" className="space-y-3">
+          <form onSubmit={handleManualSubmit} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-1">
                 Material Name
               </label>
               <Input

@@ -69,12 +69,10 @@ interface SerpAPIResponse {
 export async function searchHomeDepotProducts(query: string, zipCode?: string): Promise<MaterialOption[]> {
   // Input validation - prevent abuse
   if (!query || typeof query !== 'string') {
-    console.error('[HomeDepot API] Invalid search query:', query);
     throw new Error('Invalid search query');
   }
 
   const cleanQuery = query.trim();
-  console.log('[HomeDepot API] Searching for:', cleanQuery, 'ZIP:', zipCode || 'N/A');
   
   // Limit query length (prevent large payload attacks)
   if (cleanQuery.length > 100) {
@@ -89,42 +87,34 @@ export async function searchHomeDepotProducts(query: string, zipCode?: string): 
   const apiKey = import.meta.env.VITE_SERPAPI_API_KEY;
 
   try {
-    console.log('[HomeDepot API] Making request to SerpAPI...');
     const url = new URL('https://serpapi.com/search');
     url.searchParams.append('api_key', apiKey);
     url.searchParams.append('engine', 'home_depot_product_search');
     url.searchParams.append('q', cleanQuery);
     if (zipCode) {
       // SerpAPI Home Depot engine accepts location/zip for local results
-      console.log('[HomeDepot API] Including location:', zipCode);
       url.searchParams.append('location', zipCode);
     }
     url.searchParams.append('num', '6');
 
-    // Request with timeout (10 seconds)
+    // Request with timeout (30 seconds)
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 10000);
+    const timeoutId = setTimeout(() => controller.abort(), 30000);
 
     const response = await fetch(url.toString(), { signal: controller.signal });
     clearTimeout(timeoutId);
 
-    console.log('[HomeDepot API] Response status:', response.status);
-
     if (!response.ok) {
-      console.error('[HomeDepot API] SerpAPI error:', response.status);
       throw new Error(`SerpAPI error: ${response.status}`);
     }
 
     const data: SerpAPIResponse = await response.json();
-    console.log('[HomeDepot API] Received products:', data.products?.length || 0);
 
     if (data.error) {
-      console.error('[HomeDepot API] API returned error:', data.error);
       throw new Error(data.error);
     }
 
     if (!data.products || data.products.length === 0) {
-      console.log('[HomeDepot API] No products found, using fallback');
       return getFallbackMaterials(cleanQuery);
     }
 
@@ -143,10 +133,11 @@ export async function searchHomeDepotProducts(query: string, zipCode?: string): 
       };
     });
   } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : String(error);
-    console.error('[HomeDepot API] Search failed:', errorMsg);
-    console.log('[HomeDepot API] Using fallback materials');
-    return getFallbackMaterials(cleanQuery);
+    // Throw error instead of silently falling back (so component can handle with toast)
+    if (error instanceof Error && error.name === 'AbortError') {
+      throw new Error('Search is taking longer than expected. Please try again.');
+    }
+    throw error;
   }
 }
 
@@ -258,9 +249,59 @@ export async function fetchCleaningTypes(): Promise<CleaningTypeOption[]> {
 }
 
 // ---------------------------------------------------------------------------
-// 5️⃣ Submit estimate – mock
-// TODO: Replace with POST to your backend (e.g., /api/quote or a form service)
+// 5️⃣ Submit estimate – Save to Google Sheets
+// Saves estimate data to a Google Sheet for tracking and follow-up
 // ---------------------------------------------------------------------------
-export async function submitEstimate(payload: unknown): Promise<void> {
-  await new Promise(r => setTimeout(r, 800));
+export async function submitEstimate(payload: {
+  serviceType: 'flooring' | 'cleaning';
+  contact: { name: string; email: string; phone: string };
+  address: string;
+  zipCode?: string;
+  coverage?: string;
+  totalSqFt?: number;
+  material?: string;
+  cleaningType?: string;
+  frequency?: string;
+  estimate?: number | null;
+  needsMeasurement?: boolean;
+  roomDetails?: string;
+  materialNames?: string;
+  materialUrls?: string;
+  [key: string]: unknown;
+}): Promise<void> {
+  try {
+    // Determine estimate type based on whether we have a price
+    const estimateType = payload.estimate || payload.needsMeasurement ? 'schedule' : 'estimate';
+    
+    const requestData = {
+      service: payload.serviceType,
+      type: estimateType,
+      contact: payload.contact,
+      address: payload.address,
+      zipCode: payload.zipCode || 'N/A',
+      totalSqFt: payload.totalSqFt,
+      coverage: payload.coverage,
+      material: payload.material,
+      cleaningType: payload.cleaningType,
+      frequency: payload.frequency,
+      price: payload.estimate,
+      roomDetails: payload.roomDetails,
+      materialNames: payload.materialNames,
+      materialUrls: payload.materialUrls,
+    };
+
+    const response = await fetch('/api/submit-estimate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(requestData),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error || 'Failed to submit estimate');
+    }
+  } catch (error) {
+    console.error('Error submitting estimate:', error);
+    // Don't throw - let the UI handle errors gracefully
+  }
 }

@@ -35,6 +35,15 @@ export type CoverageType = 'whole' | 'specific' | null;
 
 export type CleaningFrequency = 'one-time' | 'monthly';
 
+export type RoomMaterial = {
+  room: string;
+  sqFt: number;
+  material: MaterialOption | null;
+  manualPrice?: number;
+  manualName?: string;
+  url?: string; // Product URL from Home Depot or other sources
+};
+
 export type FlooringState = {
   step: number;
   useZillow: boolean | null;
@@ -48,8 +57,9 @@ export type FlooringState = {
   material: MaterialOption | null;
   manualMaterial: ManualMaterial | null;
   materialSource: MaterialSource | null;
+  roomMaterials: RoomMaterial[];
   estimate: number | null;
-  contact: { name: string; email: string; phone: string };
+  contact: { name: string; email: string; phone: string; observations?: string };
 };
 
 export type CleaningState = {
@@ -64,8 +74,9 @@ export type CleaningState = {
   selectedRooms: string[];
   cleaningType: CleaningTypeOption | null;
   frequency: CleaningFrequency | null;
+  roomMaterials: RoomMaterial[];
   estimate: number | null;
-  contact: { name: string; email: string; phone: string };
+  contact: { name: string; email: string; phone: string; observations?: string };
 };
 
 export type Service = 'flooring' | 'cleaning' | null;

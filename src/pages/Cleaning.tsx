@@ -232,6 +232,11 @@ const Cleaning = () => {
           pricePerSqFt={c.cleaningType.pricePerSqFt}
           serviceType="cleaning"
           contact={c.contact}
+          address={c.address}
+          zipCode={c.zipCode}
+          coverage="whole"
+          cleaningType={c.cleaningType.name}
+          frequency={c.frequency || undefined}
           onSchedule={handleEstimateSubmit}
         />
       )}
@@ -248,6 +253,7 @@ const Cleaning = () => {
           serviceType="cleaning"
           contact={c.contact}
           address={c.address}
+          zipCode={c.zipCode}
           coverageType="specific"
           onDone={handleScheduleDone}
         />
@@ -263,6 +269,11 @@ const Cleaning = () => {
           pricePerSqFt={c.cleaningType.pricePerSqFt}
           serviceType="cleaning"
           contact={c.contact}
+          address={c.address}
+          zipCode={c.zipCode}
+          coverage="specific"
+          cleaningType={c.cleaningType.name}
+          frequency={c.frequency || undefined}
           onSchedule={handleEstimateSubmit}
         />
       )}

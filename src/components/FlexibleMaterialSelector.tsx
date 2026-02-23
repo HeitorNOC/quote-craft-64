@@ -28,9 +28,10 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
   const [manualPrice, setManualPrice] = useState('');
   const [suggestions, setSuggestions] = useState<MaterialOption[]>([]);
   const [suggestionsLoading, setSuggestionsLoading] = useState(false);
+  const [hasAttemptedSearch, setHasAttemptedSearch] = useState(false);
   const { toast } = useToast();
 
-  const { results: searchResults, loading: searchLoading, error: searchError, search } = useHomeDepotSearch();
+  const { results: searchResults, loading: searchLoading, error: searchError, search, clear: clearSearch } = useHomeDepotSearch();
 
   // Load suggestions on mount
   useEffect(() => {
@@ -49,7 +50,15 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
-      search(searchQuery, zipCode);
+      setHasAttemptedSearch(true);
+      search(searchQuery, zipCode).catch(() => {
+        // Error is already in searchError, will be shown below
+        toast({
+          title: 'Search unavailable',
+          description: 'Using suggestions instead. Please try again later.',
+          variant: 'destructive',
+        });
+      });
     }
   };
 
@@ -78,13 +87,20 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
   };
 
   return (
-    <div className="w-full max-w-3xl mx-auto space-y-6">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900">Choose Your Material</h2>
-        <p className="text-gray-600 mt-2">Search Home Depot, enter manually, or use our suggestions</p>
+    <div className="w-full max-w-3xl mx-auto space-y-3">
+      <div className="text-center mb-4">
+        <h2 className="text-2xl font-bold text-gray-900">Choose Your Material</h2>
+        <p className="text-sm text-gray-600 mt-1">Search Home Depot, enter manually, or use our suggestions</p>
       </div>
 
-      <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
+      <Tabs value={tab} onValueChange={(v) => {
+        setTab(v as any);
+        // Clear search error when switching tabs
+        if (v !== 'search') {
+          clearSearch();
+          setHasAttemptedSearch(false);
+        }
+      }} className="w-full">
         <TabsList className="grid w-full grid-cols-3">
           <TabsTrigger value="search">🔍 Search Home Depot</TabsTrigger>
           <TabsTrigger value="manual">✏️ Manual Entry</TabsTrigger>
@@ -92,10 +108,10 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
         </TabsList>
 
         {/* Tab 1: Search Home Depot */}
-        <TabsContent value="search" className="space-y-4">
-          <form onSubmit={handleSearch} className="space-y-4">
+        <TabsContent value="search" className="space-y-3">
+          <form onSubmit={handleSearch} className="space-y-2">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-1">
                 Search Home Depot
               </label>
               <div className="flex gap-2">
@@ -103,7 +119,11 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
                   type="text"
                   placeholder="Ex: vinyl flooring, ceramic tile..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value);
+                    // Clear error when user starts typing again
+                    if (searchError) clearSearch();
+                  }}
                   disabled={searchLoading}
                 />
                 <Button
@@ -120,9 +140,9 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
             </div>
           </form>
 
-          {searchError && (
+          {hasAttemptedSearch && searchError && (
             <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg text-sm text-yellow-800">
-              ⚠️ {searchError}. Using suggested materials.
+              ⚠️ {searchError}
             </div>
           )}
 
@@ -130,10 +150,10 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
 
           {searchResults.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">
+              <p className="text-xs font-medium text-gray-700">
                 {searchResults.length} results found:
               </p>
-              <div className="scrollable-material-list border-2 border-blue-300">
+              <div className="scrollable-material-list border border-blue-200">
                 {searchResults.map((material) => (
                   <Card
                     key={material.id}
@@ -198,10 +218,10 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
         </TabsContent>
 
         {/* Tab 2: Manual Input */}
-        <TabsContent value="manual" className="space-y-4">
-          <form onSubmit={handleManualSubmit} className="space-y-4">
+        <TabsContent value="manual" className="space-y-3">
+          <form onSubmit={handleManualSubmit} className="space-y-3">
             <div>
-              <label className="block text-sm font-medium text-gray-900 mb-2">
+              <label className="block text-sm font-medium text-gray-900 mb-1">
                 Material Name
               </label>
               <Input
@@ -243,13 +263,13 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
         </TabsContent>
 
         {/* Tab 3: Suggestions */}
-        <TabsContent value="suggestions" className="space-y-4">
+        <TabsContent value="suggestions" className="space-y-3">
           {suggestionsLoading && <LoadingSpinner text="Loading suggestions..." />}
 
           {suggestions.length > 0 && (
             <div className="space-y-2">
-              <p className="text-sm font-medium text-gray-700">Suggested Materials:</p>
-              <div className="scrollable-material-list border-2 border-green-300">
+              <p className="text-xs font-medium text-gray-700">Suggested Materials:</p>
+              <div className="scrollable-material-list border border-green-200">
                 {suggestions.map((material) => (
                   <Card
                     key={material.id}
@@ -313,12 +333,6 @@ export default function FlexibleMaterialSelector({ onSelect, flooringType, zipCo
           )}
         </TabsContent>
       </Tabs>
-
-      <div className="text-center text-xs text-gray-500 border-t pt-4">
-        <p>
-          ✓ Precise search: Home Depot | ✏️ Customize: Manual | 💡 Quick: Suggestions
-        </p>
-      </div>
     </div>
   );
 }

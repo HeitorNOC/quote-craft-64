@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import type {
   Service, FlooringState, CleaningState,
   Room, MaterialOption, ManualMaterial, MaterialSource,
-  CleaningTypeOption, CoverageType, CleaningFrequency,
+  CleaningTypeOption, CoverageType, CleaningFrequency, RoomMaterial,
 } from '@/types';
 
 const STORAGE_KEY = 'jdServiceStore';
@@ -11,13 +11,13 @@ const defaultFlooring: FlooringState = {
   step: 1, useZillow: null, address: '', zipCode: '', totalSqFt: 0,
   coverageType: null, knowsSqFt: null,
   rooms: [], selectedRooms: [], material: null, manualMaterial: null,
-  materialSource: null, estimate: null, contact: { name: '', email: '', phone: '' },
+  materialSource: null, roomMaterials: [], estimate: null, contact: { name: '', email: '', phone: '' },
 };
 
 const defaultCleaning: CleaningState = {
   step: 1, useZillow: null, address: '', zipCode: '', totalSqFt: 0,
   coverageType: null, knowsSqFt: null,
-  rooms: [], selectedRooms: [], cleaningType: null, frequency: null, estimate: null,
+  rooms: [], selectedRooms: [], cleaningType: null, frequency: null, roomMaterials: [], estimate: null,
   contact: { name: '', email: '', phone: '' },
 };
 
@@ -40,6 +40,7 @@ interface ServiceStore {
   setFlooringMaterial: (m: MaterialOption | null) => void;
   setFlooringManualMaterial: (m: ManualMaterial | null) => void;
   setFlooringMaterialSource: (s: MaterialSource | null) => void;
+  setFlooringRoomMaterials: (materials: RoomMaterial[]) => void;
   setFlooringEstimate: (v: number | null) => void;
   setFlooringContact: (c: { name: string; email: string; phone: string }) => void;
   // Cleaning actions
@@ -54,6 +55,7 @@ interface ServiceStore {
   setCleaningKnowsSqFt: (v: boolean | null) => void;
   setCleaningType: (t: CleaningTypeOption | null) => void;
   setCleaningFrequency: (f: CleaningFrequency) => void;
+  setCleaningRoomMaterials: (materials: RoomMaterial[]) => void;
   setCleaningEstimate: (v: number | null) => void;
   setCleaningContact: (c: { name: string; email: string; phone: string }) => void;
   // Reset
@@ -104,6 +106,7 @@ export const useServiceStore = create<ServiceStore>((set, get) => {
     setFlooringMaterial: (m) => persistSet(st => ({ flooring: { ...st.flooring, material: m } })),
     setFlooringManualMaterial: (m) => persistSet(st => ({ flooring: { ...st.flooring, manualMaterial: m } })),
     setFlooringMaterialSource: (s) => persistSet(st => ({ flooring: { ...st.flooring, materialSource: s } })),
+    setFlooringRoomMaterials: (materials) => persistSet(st => ({ flooring: { ...st.flooring, roomMaterials: materials } })),
     setFlooringEstimate: (v) => persistSet(st => ({ flooring: { ...st.flooring, estimate: v } })),
     setFlooringContact: (c) => persistSet(st => ({ flooring: { ...st.flooring, contact: c } })),
 
@@ -118,6 +121,7 @@ export const useServiceStore = create<ServiceStore>((set, get) => {
     setCleaningKnowsSqFt: (v) => persistSet(st => ({ cleaning: { ...st.cleaning, knowsSqFt: v } })),
     setCleaningType: (t) => persistSet(st => ({ cleaning: { ...st.cleaning, cleaningType: t } })),
     setCleaningFrequency: (f) => persistSet(st => ({ cleaning: { ...st.cleaning, frequency: f } })),
+    setCleaningRoomMaterials: (materials) => persistSet(st => ({ cleaning: { ...st.cleaning, roomMaterials: materials } })),
     setCleaningEstimate: (v) => persistSet(st => ({ cleaning: { ...st.cleaning, estimate: v } })),
     setCleaningContact: (c) => persistSet(st => ({ cleaning: { ...st.cleaning, contact: c } })),
 

@@ -1,17 +1,19 @@
 import { useForm } from 'react-hook-form';
 import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 import { Button } from '@/components/ui/button';
-import { Mail, Phone, User } from 'lucide-react';
+import { Mail, Phone, User, FileText } from 'lucide-react';
 
 interface ContactInfoStepProps {
-  initialValues?: { name: string; email: string; phone: string };
-  onSubmit: (data: { name: string; email: string; phone: string }) => void;
+  initialValues?: { name: string; email: string; phone: string; observations?: string };
+  onSubmit: (data: { name: string; email: string; phone: string; observations?: string }) => void;
 }
 
 interface FormValues {
   name: string;
   email: string;
   phone: string;
+  observations?: string;
 }
 
 const ContactInfoStep = ({ initialValues, onSubmit }: ContactInfoStepProps) => {
@@ -71,6 +73,20 @@ const ContactInfoStep = ({ initialValues, onSubmit }: ContactInfoStepProps) => {
           })}
         />
         {errors.phone && <p className="text-xs text-destructive">{errors.phone.message}</p>}
+      </div>
+
+      <div className="space-y-1">
+        <label className="text-sm font-medium flex items-center gap-2">
+          <FileText className="h-4 w-4 text-muted-foreground" /> Additional Notes (Optional)
+        </label>
+        <Textarea
+          placeholder="Any special requests, concerns, or details we should know about your project? (e.g., budget constraints, color preferences, timeline)"
+          {...register('observations')}
+          className="min-h-24"
+        />
+        <p className="text-xs text-muted-foreground">
+          This helps us provide a more personalized estimate and service
+        </p>
       </div>
 
       <Button type="submit" className="w-full" size="lg">

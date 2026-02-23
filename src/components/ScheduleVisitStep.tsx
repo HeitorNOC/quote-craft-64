@@ -10,11 +10,12 @@ interface ScheduleVisitStepProps {
   serviceType: 'flooring' | 'cleaning';
   contact: { name: string; email: string; phone: string };
   address?: string;
+  zipCode?: string;
   coverageType: string;
   onDone: () => void;
 }
 
-const ScheduleVisitStep = ({ serviceType, contact, address, coverageType, onDone }: ScheduleVisitStepProps) => {
+const ScheduleVisitStep = ({ serviceType, contact, address, zipCode, coverageType, onDone }: ScheduleVisitStepProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
@@ -25,7 +26,8 @@ const ScheduleVisitStep = ({ serviceType, contact, address, coverageType, onDone
         serviceType,
         contact,
         address: address || 'Not provided',
-        coverageType,
+        zipCode: zipCode || 'N/A',
+        coverage: coverageType,
         needsMeasurement: true,
         estimate: null,
       });

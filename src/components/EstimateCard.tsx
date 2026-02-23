@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { AlertTriangle, DollarSign } from 'lucide-react';
+import { AlertTriangle, DollarSign, ExternalLink } from 'lucide-react';
 import { formatCurrency } from '@/lib/utils';
 import { submitEstimate } from '@/lib/api';
 import { useToast } from '@/hooks/use-toast';
 import LoadingSpinner from './LoadingSpinner';
+import type { RoomMaterial } from '@/types';
 
 interface EstimateCardProps {
   estimate: number;
@@ -14,17 +15,75 @@ interface EstimateCardProps {
   pricePerSqFt: number;
   serviceType: 'flooring' | 'cleaning';
   contact: { name: string; email: string; phone: string };
+  address: string;
+  zipCode: string;
+  coverage?: string;
+  material?: string;
+  cleaningType?: string;
+  frequency?: string;
+  roomMaterials?: RoomMaterial[];
   onSchedule: () => void;
 }
 
-const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType, contact, onSchedule }: EstimateCardProps) => {
+const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType, contact, address, zipCode, coverage, material, cleaningType, frequency, roomMaterials, onSchedule }: EstimateCardProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+
+  // Format room materials for submission
+  const formatRoomDetails = (): string => {
+    if (!roomMaterials || roomMaterials.length === 0) return '';
+    return roomMaterials
+      .map((rm) => {
+        const matName = rm.material?.name || rm.manualName || 'Unknown';
+        const price = rm.material?.pricePerSqFt || rm.manualPrice || 0;
+        const roomCost = rm.sqFt * price;
+        const urlPart = rm.url ? ` [${rm.url}]` : '';
+        return `${rm.room} (${rm.sqFt} sqft) → ${matName} @ $${price.toFixed(2)}/sqft = $${roomCost.toFixed(2)}${urlPart}`;
+      })
+      .join(' | ');
+  };
+
+  const formatMaterialNames = (): string => {
+    if (!roomMaterials || roomMaterials.length === 0) return '';
+    return roomMaterials
+      .map((rm) => {
+        const matName = rm.material?.name || rm.manualName || 'Unknown';
+        return `${rm.room}: ${matName}`;
+      })
+      .join(' | ');
+  };
+
+  const formatMaterialUrls = (): string => {
+    if (!roomMaterials || roomMaterials.length === 0) return '';
+    return roomMaterials
+      .filter((rm) => rm.url)
+      .map((rm) => {
+        const matName = rm.material?.name || rm.manualName || 'N/A';
+        return `${rm.room} (${matName}): ${rm.url}`;
+      })
+      .join(' | ');
+  };
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await submitEstimate({ serviceType, estimate, totalSqFt, pricePerSqFt, flatFee, contact });
+      await submitEstimate({
+        serviceType,
+        estimate,
+        totalSqFt,
+        pricePerSqFt,
+        flatFee,
+        contact,
+        address,
+        zipCode,
+        coverage,
+        material,
+        cleaningType,
+        frequency,
+        roomDetails: formatRoomDetails(),
+        materialNames: formatMaterialNames(),
+        materialUrls: formatMaterialUrls(),
+      });
       toast({ title: 'Estimate submitted!', description: 'We\'ll be in touch soon.' });
       onSchedule();
     } catch {
@@ -41,9 +100,54 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
 
       <Card className="p-6 bg-muted/30 border-secondary/30">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground">Total area: {totalSqFt.toLocaleString()} sq ft</p>
-          <p className="text-sm text-muted-foreground">Rate: {formatCurrency(pricePerSqFt)}/sq ft</p>
-          <div className="border-t border-border my-3" />
+          {roomMaterials && roomMaterials.length > 0 ? (
+            <>
+              {roomMaterials.map((rm) => {
+                const price = rm.material?.pricePerSqFt || rm.manualPrice || 0;
+                const roomCost = rm.sqFt * price;
+                const matName = rm.material?.name || rm.manualName || 'Unknown';
+                return (
+                  <div key={rm.room} className="space-y-2 py-3 border-b border-border/30 last:border-b-0">
+                    <div className="flex justify-between items-start">
+                      <div>
+                        <div className="font-medium text-foreground">{rm.room}</div>
+                        <div className="text-xs text-muted-foreground">{rm.sqFt} sq.ft</div>
+                      </div>
+                      <span className="font-semibold text-foreground">{formatCurrency(roomCost)}</span>
+                    </div>
+                    <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 p-2 rounded">
+                      <div className="text-xs">
+                        <div className="font-medium text-gray-900 dark:text-gray-100">{matName}</div>
+                        <div className="text-gray-600 dark:text-gray-400">@${price.toFixed(2)}/sqft</div>
+                      </div>
+                      {rm.url && (
+                        <a 
+                          href={rm.url} 
+                          target="_blank" 
+                          rel="noopener noreferrer" 
+                          className="text-blue-600 hover:text-blue-800 dark:text-blue-400 flex-shrink-0"
+                          title="View product"
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+              <div className="border-t border-border my-3" />
+              <div className="flex justify-between text-sm text-muted-foreground">
+                <span>Subtotal:</span>
+                <span>{formatCurrency(estimate)}</span>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-muted-foreground">Total area: {totalSqFt.toLocaleString()} sq ft</p>
+              <p className="text-sm text-muted-foreground">Rate: {formatCurrency(pricePerSqFt)}/sq ft</p>
+              <div className="border-t border-border my-3" />
+            </>
+          )}
           <p className="text-4xl font-display font-bold text-foreground">
             {formatCurrency(estimate)}
           </p>
