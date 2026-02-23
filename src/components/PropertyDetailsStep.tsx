@@ -39,11 +39,14 @@ const PropertyDetailsStep = ({
       return;
     }
 
-    const sqFtNum = parseInt(sqFt, 10);
-    
-    if (!sqFt.trim() || isNaN(sqFtNum) || sqFtNum <= 0) {
-      toast({ title: 'Please enter a valid square footage', variant: 'destructive' });
-      return;
+    // Square footage is now optional - will be marked as unknown if not provided
+    let sqFtNum = 0;
+    if (sqFt.trim()) {
+      sqFtNum = parseInt(sqFt, 10);
+      if (isNaN(sqFtNum) || sqFtNum <= 0) {
+        toast({ title: 'Please enter a valid square footage or leave it empty if unknown', variant: 'destructive' });
+        return;
+      }
     }
 
     onContinue(address.trim(), zipCode.trim(), sqFtNum);
@@ -93,10 +96,10 @@ const PropertyDetailsStep = ({
         </div>
 
         <div>
-          <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Total Square Footage</label>
+          <label className="block text-xs sm:text-sm font-medium mb-1.5 sm:mb-2">Total Square Footage <span className="text-muted-foreground text-xs">(optional)</span></label>
           <Input
             type="number"
-            placeholder="e.g., 2500"
+            placeholder="e.g., 2500 (or leave blank if unknown)"
             value={sqFt}
             onChange={(e) => setSqFt(e.target.value)}
             min="100"
@@ -104,7 +107,7 @@ const PropertyDetailsStep = ({
             step="1"
           />
           <p className="text-xs text-muted-foreground mt-1">
-            Used to calculate material quantity for your flooring project
+            If you don't know, you can schedule a visit for an on-site assessment
           </p>
         </div>
       </Card>
@@ -112,7 +115,7 @@ const PropertyDetailsStep = ({
       <Button 
         onClick={handleContinue} 
         className="w-full gap-2"
-        disabled={!address.trim() || !zipCode.trim() || !sqFt.trim()}
+        disabled={!address.trim() || !zipCode.trim()}
       >
         Continue <ArrowRight className="h-4 w-4" />
       </Button>

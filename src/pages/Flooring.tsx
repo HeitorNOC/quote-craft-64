@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useServiceStore } from '@/store/useServiceStore';
 import WizardLayout from '@/components/WizardLayout';
 import ContactInfoStep from '@/components/ContactInfoStep';
-import ZillowFetcher from '@/components/ZillowFetcher';
+// import ZillowFetcher from '@/components/ZillowFetcher'; // Commented out - using manual property details only
 import PropertyDetailsStep from '@/components/PropertyDetailsStep';
 import RoomManagementStep from '@/components/RoomManagementStep';
 import FlooringMaterialSelector from '@/components/FlooringMaterialSelector';
@@ -19,11 +19,14 @@ import type { Room, MaterialOption, ManualMaterial, MaterialSource, CoverageType
 const FLAT_FEE = 50;
 
 /*
-  Complete Flow with validations:
-  1. Contact → 2. Zillow → 3. PropertyDetails → 4. Coverage → ...
-  Path A (Whole house): 4→5.Material→6.Estimate (6 steps)
-  Path B (Specific + knows sqft): 4→5.SqFtKnowledge(yes)→6.RoomManagement→7.Material→8.Estimate (8 steps)
-  Path C (Specific + no sqft): 4→5.SqFtKnowledge(no)→6.Schedule (6 steps)
+  Complete Flow with validations (Zillow removed - using manual details):
+  1. Contact → 2. PropertyDetails → 3. Coverage → ...
+  Path A (Whole house): 3→4.Material→5.Estimate (5 steps)
+  Path B (Specific + knows sqft): 3→4.SqFtKnowledge(yes)→5.RoomManagement→6.Material→7.Estimate (7 steps)
+  Path C (Specific + no sqft): 3→4.SqFtKnowledge(no)→5.Schedule (5 steps)
+  
+  // COMMENTED: Zillow integration removed in favor of manual property details
+  // Previous flow: 1.Contact → 2.Zillow → 3.PropertyDetails → 4.Coverage → ...
 */
 
 const Flooring = () => {
@@ -52,12 +55,12 @@ const Flooring = () => {
   }, [service, navigate]);
 
   const totalSteps = useMemo(() => {
-    if (f.coverageType === 'whole') return 6;
-    if (f.coverageType === 'specific' && f.knowsSqFt === false) return 6;
-    if (f.coverageType === 'specific' && f.knowsSqFt === true) return 8;
-    // If specific but knowsSqFt not yet set, we're in step 5 (SqFtKnowledgeStep)
-    if (f.coverageType === 'specific') return 6;
-    return 6;
+    if (f.coverageType === 'whole') return 5; // Was 6
+    if (f.coverageType === 'specific' && f.knowsSqFt === false) return 5; // Was 6
+    if (f.coverageType === 'specific' && f.knowsSqFt === true) return 7; // Was 8
+    // If specific but knowsSqFt not yet set, we're in step 4 (SqFtKnowledgeStep)
+    if (f.coverageType === 'specific') return 5; // Was 6
+    return 5; // Was 6
   }, [f.coverageType, f.knowsSqFt]);
 
   const goBack = useCallback(() => {
@@ -67,57 +70,58 @@ const Flooring = () => {
 
   const handleContact = useCallback((data: { name: string; email: string; phone: string }) => {
     setContact(data);
-    setStep(2);
+    setStep(2); // Now goes directly to PropertyDetailsStep (was step 3, now step 2)
   }, [setContact, setStep]);
 
-  const handleZillowData = useCallback((totalSqFt: number, zipCode: string, _address: string) => {
-    setUseZillow(true);
-    setZillowData(totalSqFt);
-    setZipCode(zipCode);
-    setStep(3);
-  }, [setUseZillow, setZillowData, setZipCode, setStep]);
+  // COMMENTED: Zillow integration removed
+  // const handleZillowData = useCallback((totalSqFt: number, zipCode: string, _address: string) => {
+  //   setUseZillow(true);
+  //   setZillowData(totalSqFt);
+  //   setZipCode(zipCode);
+  //   setStep(3);
+  // }, [setUseZillow, setZillowData, setZipCode, setStep]);
 
-  const handleSkipZillow = useCallback(() => {
-    setUseZillow(false);
-    setStep(3);
-  }, [setUseZillow, setStep]);
+  // const handleSkipZillow = useCallback(() => {
+  //   setUseZillow(false);
+  //   setStep(3);
+  // }, [setUseZillow, setStep]);
 
   const handlePropertyDetails = useCallback((address: string, zipCode: string, sqFt: number) => {
     setAddress(address);
     setZillowData(sqFt);
     setZipCode(zipCode);
-    setStep(4);
+    setStep(3); // Now goes to Coverage (was step 4)
   }, [setAddress, setZillowData, setZipCode, setStep]);
 
   const handleCoverage = useCallback((type: CoverageType) => {
     setCoverageType(type);
     if (type === 'whole') {
-      setStep(5); // Material directly
+      setStep(4); // Material directly (was step 5)
     } else {
       // Specific: go to SqFtKnowledgeStep to ask if they know sqft
-      setStep(5);
+      setStep(4); // (was step 5)
     }
   }, [setCoverageType, setStep]);
 
   const handleKnowsSqFt = useCallback((knows: boolean) => {
     setKnowsSqFt(knows);
     if (knows) {
-      setStep(6); // RoomManagement
+      setStep(5); // RoomManagement (was step 6)
     } else {
-      setStep(6); // Schedule
+      setStep(5); // Schedule (was step 6)
     }
   }, [setKnowsSqFt, setStep]);
 
   const handleRoomManagement = useCallback((rooms: Room[], selectedRooms: string[]) => {
     setManualRooms(rooms);
     setSelectedRooms(selectedRooms);
-    setStep(7);
+    setStep(6); // Material selector (was step 7)
   }, [setManualRooms, setSelectedRooms, setStep]);
 
   const handleRoomMaterials = useCallback((roomMaterials: RoomMaterial[], totalCost: number) => {
     setRoomMaterials(roomMaterials);
     setEstimate(totalCost + FLAT_FEE);
-    setStep(8);
+    setStep(7); // Estimate (was step 8)
   }, [setRoomMaterials, setEstimate, setStep]);
 
   // MaterialSelector uses (material, manualMaterial, source) signature
@@ -146,11 +150,11 @@ const Flooring = () => {
     if (f.coverageType === 'whole') {
       const est = f.totalSqFt * price + FLAT_FEE;
       setEstimate(est);
-      setStep(6);
+      setStep(5); // Estimate (was step 6)
     } else {
       const est = calculateFlooringEstimate(f.selectedRooms, f.rooms, price, FLAT_FEE);
       setEstimate(est);
-      setStep(8);
+      setStep(7); // Estimate (was step 8)
     }
   }, [setMaterial, setManualMaterial, setMaterialSource, setEstimate, setStep, f.coverageType, f.totalSqFt, f.selectedRooms, f.rooms, f.zipCode]);
 
@@ -175,33 +179,32 @@ const Flooring = () => {
 
   const getStepTitle = (): string => {
     if (f.step === 1) return 'Contact Information';
-    if (f.step === 2) return 'Find Your Property';
-    if (f.step === 3) return 'Property Details';
-    if (f.step === 4) return 'Coverage Area';
+    if (f.step === 2) return 'Property Details'; // Was step 3
+    if (f.step === 3) return 'Coverage Area'; // Was step 4
     if (f.coverageType === 'whole') {
-      if (f.step === 5) return 'Choose Flooring Material';
-      if (f.step === 6) return 'Your Estimate';
+      if (f.step === 4) return 'Choose Flooring Material'; // Was step 5
+      if (f.step === 5) return 'Your Estimate'; // Was step 6
     } else {
-      if (f.step === 5) return 'Measurement Knowledge';
-      if (f.step === 6) return f.knowsSqFt ? 'Define Areas' : 'Schedule Visit';
-      if (f.step === 7) return 'Choose Flooring Material';
-      if (f.step === 8) return 'Your Estimate';
+      if (f.step === 4) return 'Measurement Knowledge'; // Was step 5
+      if (f.step === 5) return f.knowsSqFt ? 'Define Areas' : 'Schedule Visit'; // Was step 6
+      if (f.step === 6) return 'Choose Flooring Material'; // Was step 7
+      if (f.step === 7) return 'Your Estimate'; // Was step 8
     }
     return '';
   };
 
   const getStepLabels = (): string[] => {
     if (f.coverageType === 'whole') {
-      return ['Contact', 'Find', 'Details', 'Coverage', 'Material', 'Estimate'];
+      return ['Contact', 'Details', 'Coverage', 'Material', 'Estimate']; // Removed 'Find'
     }
     if (f.coverageType === 'specific' && f.knowsSqFt === false) {
-      return ['Contact', 'Find', 'Details', 'Coverage', 'Measure', 'Schedule'];
+      return ['Contact', 'Details', 'Coverage', 'Measure', 'Schedule']; // Removed 'Find'
     }
     if (f.coverageType === 'specific' && f.knowsSqFt === true) {
-      return ['Contact', 'Find', 'Details', 'Coverage', 'Measure', 'Areas', 'Material', 'Estimate'];
+      return ['Contact', 'Details', 'Coverage', 'Measure', 'Areas', 'Material', 'Estimate']; // Removed 'Find'
     }
     // While in coverage choice for specific
-    return ['Contact', 'Find', 'Details', 'Coverage', 'Measure'];
+    return ['Contact', 'Details', 'Coverage', 'Measure']; // Removed 'Find'
   };
 
   if (service !== 'flooring') return null;
@@ -211,10 +214,12 @@ const Flooring = () => {
       {f.step === 1 && (
         <ContactInfoStep initialValues={f.contact.name ? f.contact : undefined} onSubmit={handleContact} />
       )}
+      {/* COMMENTED: Zillow integration removed - using manual property details only
       {f.step === 2 && (
         <ZillowFetcher onDataFetched={handleZillowData} onSkip={handleSkipZillow} />
       )}
-      {f.step === 3 && (
+      */}
+      {f.step === 2 && (
         <PropertyDetailsStep 
           initialAddress={f.address}
           initialZipCode={f.zipCode}
@@ -222,29 +227,29 @@ const Flooring = () => {
           onContinue={handlePropertyDetails} 
         />
       )}
-      {f.step === 4 && (
+      {f.step === 3 && (
         <CoverageChoiceStep onSelect={handleCoverage} />
       )}
 
       {/* Whole house path */}
-      {f.step === 5 && f.coverageType === 'whole' && (
+      {f.step === 4 && f.coverageType === 'whole' && (
         <FlooringMaterialSelector onSelect={handleMaterialSelect} zipCode={f.zipCode} />
       )}
-      {f.step === 6 && f.coverageType === 'whole' && f.estimate !== null && (
+      {f.step === 5 && f.coverageType === 'whole' && f.estimate !== null && (
         <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} address={f.address} zipCode={f.zipCode} coverage="whole" material={f.material?.name} onSchedule={handleEstimateSubmit} />
       )}
 
       {/* Specific rooms path */}
-      {f.step === 5 && f.coverageType === 'specific' && (
+      {f.step === 4 && f.coverageType === 'specific' && (
         <SqFtKnowledgeStep onAnswer={handleKnowsSqFt} />
       )}
-      {f.step === 6 && f.coverageType === 'specific' && f.knowsSqFt === true && (
+      {f.step === 5 && f.coverageType === 'specific' && f.knowsSqFt === true && (
         <RoomManagementStep initialRooms={f.rooms.length ? f.rooms : undefined} initialSelectedRooms={f.selectedRooms} onSubmit={handleRoomManagement} />
       )}
-      {f.step === 6 && f.coverageType === 'specific' && f.knowsSqFt === false && (
+      {f.step === 5 && f.coverageType === 'specific' && f.knowsSqFt === false && (
         <ScheduleVisitStep serviceType="flooring" contact={f.contact} address={f.address} zipCode={f.zipCode} coverageType="specific" onDone={handleScheduleDone} />
       )}
-      {f.step === 7 && f.coverageType === 'specific' && (
+      {f.step === 6 && f.coverageType === 'specific' && (
         <RoomMaterialSelector
           rooms={f.rooms}
           selectedRooms={f.selectedRooms}
@@ -252,7 +257,7 @@ const Flooring = () => {
           onComplete={handleRoomMaterials}
         />
       )}
-      {f.step === 8 && f.coverageType === 'specific' && f.estimate !== null && (
+      {f.step === 7 && f.coverageType === 'specific' && f.estimate !== null && (
         <EstimateCard estimate={f.estimate} flatFee={FLAT_FEE} totalSqFt={totalSelectedSqFt} pricePerSqFt={pricePerSqFt} serviceType="flooring" contact={f.contact} address={f.address} zipCode={f.zipCode} coverage="specific" material={f.material?.name} roomMaterials={f.roomMaterials} onSchedule={handleEstimateSubmit} />
       )}
     </WizardLayout>

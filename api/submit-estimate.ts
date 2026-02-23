@@ -37,14 +37,11 @@ async function getSheets() {
 async function appendToSheet(sheetName: string, values: any[][]) {
   const sheets = await getSheets();
   
-  // Choose spreadsheet ID based on service type
-  const isFlooring = sheetName.includes('Flooring');
-  const spreadsheetId = isFlooring 
-    ? process.env.GOOGLE_SPREADSHEET_ID_FLOORING
-    : process.env.GOOGLE_SPREADSHEET_ID_CLEANING;
+  // Use single spreadsheet ID for both services (same sheet, different tabs)
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
   if (!spreadsheetId) {
-    throw new Error(`GOOGLE_SPREADSHEET_ID_${isFlooring ? 'FLOORING' : 'CLEANING'} not configured`);
+    throw new Error('GOOGLE_SPREADSHEET_ID not configured');
   }
 
   // Extract material names and URLs from roomDetails if not provided
@@ -67,14 +64,10 @@ async function appendToSheet(sheetName: string, values: any[][]) {
 async function ensureSheetExists(sheetName: string) {
   const sheets = await getSheets();
   
-  // Choose spreadsheet ID based on service type
-  const isFlooring = sheetName.includes('Flooring');
-  const spreadsheetId = isFlooring 
-    ? process.env.GOOGLE_SPREADSHEET_ID_FLOORING
-    : process.env.GOOGLE_SPREADSHEET_ID_CLEANING;
+  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
 
   if (!spreadsheetId) {
-    throw new Error(`GOOGLE_SPREADSHEET_ID_${isFlooring ? 'FLOORING' : 'CLEANING'} not configured`);
+    throw new Error('GOOGLE_SPREADSHEET_ID not configured');
   }
 
   try {
@@ -125,6 +118,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     let sheetName = '';
     let rowData: any[] = [];
 
+    // Determine if square footage is known
+    const sqFtStatus = (data.totalSqFt && data.totalSqFt > 0) ? 'Known' : 'Unknown';
+
     if (data.service === 'flooring') {
       sheetName = data.type === 'estimate' ? 'Flooring Estimates' : 'Flooring Schedule';
       rowData = [
@@ -135,7 +131,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           data.contact.phone,
           data.address,
           data.zipCode,
-          data.totalSqFt || 'N/A',
+          data.totalSqFt || 0,
+          sqFtStatus,
           data.coverage || 'N/A',
           data.roomDetails || 'N/A',
           data.material || 'N/A',
@@ -155,7 +152,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           data.contact.phone,
           data.address,
           data.zipCode,
-          data.totalSqFt || 'N/A',
+          data.totalSqFt || 0,
+          sqFtStatus,
           data.coverage || 'N/A',
           data.roomDetails || 'N/A',
           data.cleaningType || 'N/A',
