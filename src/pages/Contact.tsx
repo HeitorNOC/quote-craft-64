@@ -55,71 +55,73 @@ const ContactPage = () => {
   };
 
   return (
-    <div className="relative h-screen w-screen bg-background flex flex-col overflow-hidden">
-      {/* Split Background */}
-      <div className="absolute inset-0 flex hidden md:flex">
-        <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${bgCleaning})` }} />
-        <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${bgFlooring})` }} />
+    <div className="relative bg-background flex flex-col overflow-y-auto">
+      {/* Split Background - fixed */}
+      <div className="fixed inset-0 flex pointer-events-none">
+        <div className="absolute inset-0 flex hidden md:flex">
+          <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${bgCleaning})` }} />
+          <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${bgFlooring})` }} />
+        </div>
+        {/* Mobile background */}
+        <div className="absolute inset-0 md:hidden bg-cover bg-center" style={{ backgroundImage: `url(${bgFlooring})` }} />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/55" />
       </div>
-      {/* Mobile background */}
-      <div className="absolute inset-0 md:hidden bg-cover bg-center" style={{ backgroundImage: `url(${bgFlooring})` }} />
-      {/* Overlay */}
-      <div className="absolute inset-0 bg-black/55" />
       
       {/* Content */}
-      <div className="relative z-10 w-full h-full flex flex-col overflow-y-auto">
-        <div className="flex-1 flex flex-col px-3 sm:px-6 md:px-12 py-4 sm:py-6 md:py-8 max-w-5xl mx-auto w-full">
+      <div className="relative z-10 w-full flex flex-col">
+        <div className="flex flex-col px-4 sm:px-6 md:px-12 py-4 sm:py-6 md:py-8 max-w-5xl mx-auto w-full">
           {/* Header */}
-          <div className="flex items-start gap-2 sm:gap-3 md:gap-4 mb-6 sm:mb-8 md:mb-12 flex-shrink-0">
+          <div className="flex items-start gap-2 sm:gap-3 md:gap-4 mb-4 sm:mb-6 md:mb-8">
             <Button 
               variant="outline" 
               size="icon"
               onClick={() => navigate('/')} 
               aria-label="Go back" 
-              className="h-9 w-9 sm:h-10 sm:w-10 md:h-12 md:w-12 flex-shrink-0 flex items-center justify-center border-2"
+              className="h-8 w-8 sm:h-9 sm:w-9 md:h-10 md:w-10 flex-shrink-0 flex items-center justify-center border-2"
             >
-              <ArrowLeft className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6" />
+              <ArrowLeft className="h-4 w-4 sm:h-4 sm:w-4 md:h-5 md:w-5" />
             </Button>
             <div className="min-w-0">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-white drop-shadow-lg break-words">Get in Touch</h1>
+              <h1 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-white drop-shadow-lg break-words">Get in Touch</h1>
               <p className="text-xs sm:text-sm md:text-base text-yellow-300 font-medium mt-1">We'd love to hear from you</p>
             </div>
           </div>
 
           {/* Content Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 md:gap-8">
             {/* Left - Info */}
-            <div className="space-y-6 md:space-y-8">
+            <div className="space-y-4 sm:space-y-6">
               <div>
-                <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-white mb-2 sm:mb-3 md:mb-4">Contact Information</h2>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-white mb-1.5 sm:mb-2">Contact Information</h2>
                 <p className="text-xs sm:text-sm md:text-base text-white leading-relaxed drop-shadow">
                   Have questions or ready to get started? Reach out to us and our team will get back to you within 24 hours.
                 </p>
               </div>
 
-              <div className="space-y-4 md:space-y-6">
-                <div className="flex gap-3 md:gap-4">
+              <div className="space-y-3 sm:space-y-4">
+                <div className="flex gap-2 sm:gap-3">
                   <div className="flex-shrink-0">
-                    <Mail className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-yellow-300 mt-0.5 md:mt-1" />
+                    <Mail className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-yellow-300 mt-0.5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm sm:text-base md:text-lg font-semibold text-white mb-1 drop-shadow">Email</h3>
-                    <p className="text-xs sm:text-sm text-white/90 drop-shadow break-words">contact@jdservices.com</p>
+                    <h3 className="text-xs sm:text-sm md:text-base font-semibold text-white drop-shadow">Email</h3>
+                    <p className="text-xs text-white/90 drop-shadow break-words">contact@jdservices.com</p>
                   </div>
                 </div>
 
-                <div className="flex gap-3 md:gap-4">
+                <div className="flex gap-2 sm:gap-3">
                   <div className="flex-shrink-0">
-                    <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 md:h-8 md:w-8 text-yellow-300 mt-0.5 md:mt-1" />
+                    <MessageSquare className="h-4 w-4 sm:h-5 sm:w-5 md:h-6 md:w-6 text-yellow-300 mt-0.5" />
                   </div>
                   <div className="min-w-0">
-                    <h3 className="text-sm sm:text-base md:text-lg font-semibold text-white mb-1 drop-shadow">WhatsApp</h3>
-                    <p className="text-xs sm:text-sm text-white/90 drop-shadow">(555) 123-4567</p>
+                    <h3 className="text-xs sm:text-sm md:text-base font-semibold text-white drop-shadow">WhatsApp</h3>
+                    <p className="text-xs text-white/90 drop-shadow">(555) 123-4567</p>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white/5 backdrop-blur-sm p-4 sm:p-5 md:p-6 rounded-lg border border-yellow-300/20">
+              <div className="bg-white/5 backdrop-blur-sm p-3 sm:p-4 md:p-5 rounded-lg border border-yellow-300/20">
                 <p className="text-xs sm:text-sm md:text-base text-white leading-relaxed drop-shadow">
                   <strong className="text-yellow-300">Service Hours:</strong><br />
                   Monday - Friday: 8:00 AM - 6:00 PM<br />
@@ -131,8 +133,8 @@ const ContactPage = () => {
 
             {/* Right - Form */}
             <div>
-              <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5 md:space-y-6 bg-white/10 backdrop-blur-md p-4 sm:p-5 md:p-8 rounded-lg border border-yellow-300/30 shadow-2xl">
-                <div className="space-y-1.5 sm:space-y-2">
+              <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4 md:space-y-5 bg-white/10 backdrop-blur-md p-3 sm:p-4 md:p-6 rounded-lg border border-yellow-300/30 shadow-2xl">
+                <div className="space-y-1 sm:space-y-1.5">
                   <label htmlFor="name" className="text-xs sm:text-sm md:text-base font-semibold text-white">
                     Full Name
                   </label>
@@ -144,11 +146,11 @@ const ContactPage = () => {
                     value={formData.name}
                     onChange={handleChange}
                     required
-                    className="w-full bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base"
+                    className="w-full bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base h-8 sm:h-9"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
+                <div className="space-y-1 sm:space-y-1.5">
                   <label htmlFor="email" className="text-xs sm:text-sm md:text-base font-semibold text-white">
                     Email Address
                   </label>
@@ -160,11 +162,11 @@ const ContactPage = () => {
                     value={formData.email}
                     onChange={handleChange}
                     required
-                    className="w-full bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base"
+                    className="w-full bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base h-8 sm:h-9"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
+                <div className="space-y-1 sm:space-y-1.5">
                   <label htmlFor="phone" className="text-xs sm:text-sm md:text-base font-semibold text-white">
                     Phone Number
                   </label>
@@ -176,11 +178,11 @@ const ContactPage = () => {
                     value={formData.phone}
                     onChange={handleChange}
                     required
-                    className="w-full bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base"
+                    className="w-full bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base h-8 sm:h-9"
                   />
                 </div>
 
-                <div className="space-y-1.5 sm:space-y-2">
+                <div className="space-y-1 sm:space-y-1.5">
                   <label htmlFor="message" className="text-xs sm:text-sm md:text-base font-semibold text-white">
                     Message
                   </label>
@@ -191,7 +193,7 @@ const ContactPage = () => {
                     value={formData.message}
                     onChange={handleChange}
                     required
-                    rows={6}
+                    rows={4}
                     className="w-full resize-none bg-white/15 border-white/30 text-white placeholder:text-white/50 text-xs sm:text-sm md:text-base"
                   />
                 </div>
@@ -199,11 +201,11 @@ const ContactPage = () => {
                 <Button
                   type="submit"
                   disabled={loading}
-                  className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-semibold py-3 text-base"
+                  className="w-full bg-yellow-300 hover:bg-yellow-400 text-black font-semibold py-2 text-sm sm:text-base"
                 >
                   {loading ? (
                     <>
-                      <Loader className="h-5 w-5 mr-2 animate-spin" />
+                      <Loader className="h-4 w-4 sm:h-5 sm:w-5 mr-2 animate-spin" />
                       Sending...
                     </>
                   ) : (

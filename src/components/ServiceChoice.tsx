@@ -35,9 +35,9 @@ const ServiceChoice = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex flex-col overflow-hidden">
-      {/* Split background */}
-      <div className="absolute inset-0 flex">
+    <div className="relative h-screen flex flex-col overflow-hidden">
+      {/* Split background - fixed to viewport */}
+      <div className="absolute inset-0 flex pointer-events-none">
         <div
           className="transition-all duration-700 ease-in-out bg-cover bg-center"
           style={{
@@ -57,51 +57,55 @@ const ServiceChoice = () => {
       </div>
 
       {/* Dark overlay for readability */}
-      <div className="absolute inset-0 bg-foreground/60" />
+      <div className="absolute inset-0 bg-foreground/60 pointer-events-none" />
 
-      {/* Top Navigation Links */}
-      <div className="relative z-20 px-2 sm:px-4 py-3 sm:py-4 flex justify-between gap-2 sm:gap-4 flex-wrap">
-        <Button variant="ghost" onClick={() => navigate('/about')} className="text-sm sm:text-base md:text-lg text-primary-foreground hover:bg-primary-foreground/20 font-semibold px-2 sm:px-4">
-          About
-        </Button>
-        <Button variant="ghost" onClick={() => navigate('/portfolio')} className="text-sm sm:text-base md:text-lg text-primary-foreground hover:bg-primary-foreground/20 font-semibold px-2 sm:px-4">
-          Portfolio
-        </Button>
-        <Button variant="ghost" onClick={() => navigate('/contact')} className="text-sm sm:text-base md:text-lg text-primary-foreground hover:bg-primary-foreground/20 font-semibold px-2 sm:px-4">
-          Contact
-        </Button>
-      </div>
+      {/* Container - flex layout that fills exactly 100vh */}
+      <div className="relative z-10 flex flex-col h-full overflow-hidden">
+        {/* Top Navigation Links - fixed height */}
+        <nav className="flex-shrink-0 px-2 sm:px-4 py-2 sm:py-3 flex justify-between gap-2 sm:gap-4 flex-wrap">
+          <Button variant="ghost" onClick={() => navigate('/about')} className="text-xs sm:text-sm md:text-base text-primary-foreground hover:bg-primary-foreground/20 font-semibold px-2 sm:px-3">
+            About
+          </Button>
+          <Button variant="ghost" onClick={() => navigate('/portfolio')} className="text-xs sm:text-sm md:text-base text-primary-foreground hover:bg-primary-foreground/20 font-semibold px-2 sm:px-3">
+            Portfolio
+          </Button>
+          <Button variant="ghost" onClick={() => navigate('/contact')} className="text-xs sm:text-sm md:text-base text-primary-foreground hover:bg-primary-foreground/20 font-semibold px-2 sm:px-3">
+            Contact
+          </Button>
+        </nav>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col min-h-screen">
-        <header className="text-center py-6 sm:py-8 md:py-12 px-3 sm:px-4">
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-bold text-primary-foreground mb-2 sm:mb-3 drop-shadow-lg">
+        {/* Header/Logo - flex-shrink-0 with compressed spacing */}
+        <header className="flex-shrink-0 text-center px-3 sm:px-4 py-1.5 sm:py-2 md:py-3">
+          <h1 className="text-xl sm:text-2xl md:text-4xl lg:text-5xl font-display font-bold text-primary-foreground drop-shadow-lg" style={{ lineHeight: '1.1' }}>
             JD Flooring & Cleaning
           </h1>
-          <p className="text-base sm:text-lg md:text-xl text-primary-foreground/80 max-w-md mx-auto drop-shadow mb-4 sm:mb-6 px-2">
-            Professional home services with transparent pricing. Get your free estimate in minutes.
+          <p className="text-xs sm:text-sm md:text-base text-primary-foreground/80 drop-shadow max-w-md mx-auto px-1 mt-0.5 sm:mt-1" style={{ lineHeight: '1.3' }}>
+            Professional home services. Free estimate in minutes.
           </p>
-          <img src="/LogoJD.JPG" alt="JD Logo" className="h-40 sm:h-48 md:h-60 w-auto mx-auto drop-shadow-lg mb-0" style={{ borderRadius: 999 }} />
+          <img src="/LogoJD.JPG" alt="JD Logo" className="h-16 sm:h-20 md:h-28 w-auto mx-auto drop-shadow-lg mt-1.5 sm:mt-2" style={{ borderRadius: 999 }} />
         </header>
 
-        <main className="flex-1 flex items-center justify-stretch px-3 sm:px-4 pb-8 sm:pb-12 md:pb-16">
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-0 w-full">
+        {/* Main content - flex-1 grows to fill available space */}
+        <main className="flex-1 flex items-center justify-center px-2 sm:px-3 md:px-4 py-2 sm:py-3 min-h-0">
+          <div className="flex flex-col sm:flex-row gap-6 sm:gap-8 md:gap-10 w-full max-w-6xl h-full sm:h-auto">
             {services.map(({ key, title, description, icon: Icon, path }) => (
-              <div key={key} className="flex-1 flex items-center justify-center px-1 sm:px-0.5">
+              <div key={key} className="flex-1 flex items-center justify-center min-h-0">
                 <Card
-                  className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border-border/50 bg-card/90 backdrop-blur-sm w-full max-w-sm"
+                  className="group cursor-pointer hover:shadow-xl transition-all duration-300 hover:-translate-y-2 border-border/50 bg-card/90 backdrop-blur-sm w-full flex flex-col h-auto min-h-40 sm:min-h-56 md:min-h-64"
                   onClick={() => handleChoose(key, path)}
                   onMouseEnter={() => setHovered(key)}
                   onMouseLeave={() => setHovered(null)}
                 >
-                  <CardHeader className="text-center space-y-3 sm:space-y-4 p-4 sm:p-6 md:p-8">
+                  <CardHeader className="text-center space-y-2 sm:space-y-3 p-3 sm:p-4 md:p-6 flex-1 flex flex-col justify-between">
                     <div className="mx-auto w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 rounded-2xl bg-muted flex items-center justify-center group-hover:bg-secondary/20 transition-colors flex-shrink-0">
                       <Icon className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-primary group-hover:text-secondary transition-colors" />
                     </div>
-                    <CardTitle className="font-display text-lg sm:text-xl">{title}</CardTitle>
-                    <CardDescription className="text-xs sm:text-sm">{description}</CardDescription>
-                    <Button variant="ghost" className="gap-2 text-sm sm:text-base">
-                      Get Estimate <ArrowRight className="h-3 w-3 sm:h-4 sm:w-4 group-hover:translate-x-1 transition-transform" />
+                    <div className="space-y-1.5 sm:space-y-2">
+                      <CardTitle className="font-display text-base sm:text-lg md:text-xl">{title}</CardTitle>
+                      <CardDescription className="text-xs sm:text-sm md:text-base">{description}</CardDescription>
+                    </div>
+                    <Button variant="ghost" size="sm" className="gap-2 text-xs sm:text-sm w-fit mx-auto hover:bg-primary/10">
+                      Get Estimate <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                     </Button>
                   </CardHeader>
                 </Card>
@@ -110,8 +114,9 @@ const ServiceChoice = () => {
           </div>
         </main>
 
-        <footer className="text-center py-4 sm:py-6 text-xs text-primary-foreground/60 border-t border-primary-foreground/10 px-3">
-          © {new Date().getFullYear()} JD Flooring & Cleaning Service. All rights reserved.
+        {/* Footer - fixed height */}
+        <footer className="flex-shrink-0 text-center py-1.5 sm:py-2 text-xs text-primary-foreground/60 border-t border-primary-foreground/10 px-3">
+          © {new Date().getFullYear()} JD Flooring & Cleaning Service.
         </footer>
       </div>
     </div>
