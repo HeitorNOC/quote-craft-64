@@ -59,8 +59,8 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
   return (
     <div className="w-full max-w-2xl mx-auto space-y-3">
       <div className="text-center mb-4">
-        <h2 className="text-2xl font-bold text-gray-900">Choose Your Material</h2>
-        <p className="text-sm text-gray-600 mt-1">Search Home Depot or enter manually</p>
+        <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Choose Your Material</h2>
+        <p className="text-xs sm:text-sm text-gray-600 mt-1">Search Home Depot or enter manually</p>
       </div>
 
       <Tabs value={tab} onValueChange={(v) => setTab(v as any)} className="w-full">
@@ -115,16 +115,16 @@ export default function FlooringMaterialSelector({ onSelect, flooringType, zipCo
                 {searchResults.map((material) => (
                   <Card
                     key={material.id}
-                    className="p-4 cursor-pointer hover:shadow-md hover:bg-blue-50 transition-all"
+                    className="p-3 sm:p-4 cursor-pointer hover:shadow-md hover:bg-blue-50 transition-all"
                   >
-                    <div className="flex gap-4">
+                    <div className="flex gap-3 sm:gap-4">
                       {/* Product Image */}
                       {material.image && (
                         <div className="flex-shrink-0">
                           <img
                             src={material.image}
                             alt={material.name}
-                            className="w-24 h-24 object-cover rounded-md"
+                            className="w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 object-cover rounded-md"
                             onError={(e) => {
                               e.currentTarget.style.display = 'none';
                             }}

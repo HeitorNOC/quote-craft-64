@@ -55,7 +55,7 @@ const PropertyDetailsStep = ({
   const isPreFilled = initialSqFt > 0 && initialZipCode;
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">Property Details</h2>
         <p className="text-xs sm:text-sm text-muted-foreground px-2">
@@ -73,7 +73,7 @@ const PropertyDetailsStep = ({
             placeholder="e.g., 123 Main St, Austin, TX 78701"
             value={address}
             onChange={(e) => setAddress(e.target.value)}
-            className="text-xs sm:text-sm"
+            className="h-9 sm:h-10 text-xs sm:text-sm"
           />
           <p className="text-xs text-muted-foreground mt-1">
             Your property address
@@ -88,7 +88,7 @@ const PropertyDetailsStep = ({
             value={zipCode}
             onChange={(e) => setZipCode(e.target.value)}
             maxLength={10}
-            className="text-xs sm:text-sm"
+            className="h-9 sm:h-10 text-xs sm:text-sm"
           />
           <p className="text-xs text-muted-foreground mt-1">
             Used to find your nearest Home Depot location
@@ -103,7 +103,7 @@ const PropertyDetailsStep = ({
             value={sqFt}
             onChange={(e) => setSqFt(e.target.value)}
             min="100"
-            className="text-xs sm:text-sm"
+            className="h-9 sm:h-10 text-xs sm:text-sm"
             step="1"
           />
           <p className="text-xs text-muted-foreground mt-1">

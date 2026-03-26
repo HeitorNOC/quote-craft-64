@@ -64,7 +64,7 @@ const RoomManagementStep = ({
     .reduce((sum, r) => sum + r.sqFt, 0);
 
   return (
-    <form onSubmit={handleSubmit(onValid)} className="space-y-6">
+    <form onSubmit={handleSubmit(onValid)} className="space-y-4 sm:space-y-6">
       <div className="text-center space-y-2">
         <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">Define Areas</h2>
         <p className="text-xs sm:text-sm text-muted-foreground px-2">
@@ -102,7 +102,7 @@ const RoomManagementStep = ({
                   )}
                 </div>
                 {fields.length > 1 && (
-                  <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="h-9 w-9 sm:h-10 sm:w-10 md:h-11 md:w-11 flex-shrink-0">
+                  <Button type="button" variant="ghost" size="icon" onClick={() => remove(index)} className="h-10 w-10 md:h-11 md:w-11 flex-shrink-0">
                     <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4 text-muted-foreground" />
                   </Button>
                 )}
@@ -132,7 +132,7 @@ const RoomManagementStep = ({
             </Button>
           </div>
 
-          <div className="space-y-2 max-h-64 overflow-y-auto pr-1">
+          <div className="space-y-2 max-h-48 sm:max-h-64 overflow-y-auto pr-1">
             {validRooms.map((room) => (
               <label
                 key={room.name}

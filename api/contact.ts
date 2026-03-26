@@ -8,6 +8,15 @@ interface ContactFormData {
   message: string;
 }
 
+function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#x27;');
+}
+
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Only allow POST requests
   if (req.method !== 'POST') {
@@ -15,7 +24,11 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
   }
 
   try {
-    const { name, email, phone, message }: ContactFormData = req.body;
+    const { name: rawName, email: rawEmail, phone: rawPhone, message: rawMessage }: ContactFormData = req.body;
+    const name = escapeHtml(rawName);
+    const email = escapeHtml(rawEmail);
+    const phone = escapeHtml(rawPhone);
+    const message = escapeHtml(rawMessage);
 
     // Validate input
     if (!name || !email || !phone || !message) {
@@ -64,13 +77,13 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           <p style="color: #666; font-size: 12px;">Submitted on ${new Date().toLocaleString()}</p>
         </div>
       `,
-      replyTo: email,
+      replyTo: rawEmail,
     });
 
     // Send confirmation email to user
     const confirmationEmailPromise = resend.emails.send({
       from: 'JD Services <onboarding@resend.dev>',
-      to: email,
+      to: rawEmail,
       subject: 'We received your message - JD Services',
       html: `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">

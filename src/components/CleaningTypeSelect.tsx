@@ -32,15 +32,15 @@ const CleaningTypeSelect = ({ onSelect }: CleaningTypeSelectProps) => {
   if (loading) return <LoadingSpinner text="Loading cleaning options..." />;
 
   return (
-    <div className="space-y-4">
-      <h3 className="font-semibold">Select cleaning type</h3>
+    <div className="space-y-3 sm:space-y-4">
+      <h3 className="text-sm sm:text-base font-semibold">Select cleaning type</h3>
       <Select value={selected} onValueChange={handleSelect}>
-        <SelectTrigger>
+        <SelectTrigger className="h-9 sm:h-10 text-xs sm:text-sm">
           <SelectValue placeholder="Choose a cleaning type" />
         </SelectTrigger>
         <SelectContent>
           {types.map(t => (
-            <SelectItem key={t.id} value={t.id}>
+            <SelectItem key={t.id} value={t.id} className="text-xs sm:text-sm">
               {t.name} — ${t.pricePerSqFt.toFixed(2)}/sq ft
             </SelectItem>
           ))}
@@ -48,7 +48,7 @@ const CleaningTypeSelect = ({ onSelect }: CleaningTypeSelectProps) => {
       </Select>
 
       {selected && (
-        <Button className="w-full" onClick={() => {
+        <Button className="w-full text-xs sm:text-sm" onClick={() => {
           const t = types.find(t => t.id === selected);
           if (t) onSelect(t);
         }}>

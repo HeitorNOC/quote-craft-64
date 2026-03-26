@@ -42,7 +42,7 @@ interface ServiceStore {
   setFlooringMaterialSource: (s: MaterialSource | null) => void;
   setFlooringRoomMaterials: (materials: RoomMaterial[]) => void;
   setFlooringEstimate: (v: number | null) => void;
-  setFlooringContact: (c: { name: string; email: string; phone: string }) => void;
+  setFlooringContact: (c: { name: string; email: string; phone: string; observations?: string }) => void;
   // Cleaning actions
   setCleaningStep: (step: number) => void;
   setCleaningUseZillow: (v: boolean) => void;
@@ -57,7 +57,7 @@ interface ServiceStore {
   setCleaningFrequency: (f: CleaningFrequency) => void;
   setCleaningRoomMaterials: (materials: RoomMaterial[]) => void;
   setCleaningEstimate: (v: number | null) => void;
-  setCleaningContact: (c: { name: string; email: string; phone: string }) => void;
+  setCleaningContact: (c: { name: string; email: string; phone: string; observations?: string }) => void;
   // Reset
   resetAll: () => void;
 }

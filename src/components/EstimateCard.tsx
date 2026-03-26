@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AlertTriangle, DollarSign, ExternalLink } from 'lucide-react';
@@ -14,7 +15,7 @@ interface EstimateCardProps {
   totalSqFt: number;
   pricePerSqFt: number;
   serviceType: 'flooring' | 'cleaning';
-  contact: { name: string; email: string; phone: string };
+  contact: { name: string; email: string; phone: string; observations?: string };
   address: string;
   zipCode: string;
   coverage?: string;
@@ -28,6 +29,7 @@ interface EstimateCardProps {
 const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType, contact, address, zipCode, coverage, material, cleaningType, frequency, roomMaterials, onSchedule }: EstimateCardProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Format room materials for submission
   const formatRoomDetails = (): string => {
@@ -67,7 +69,7 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await submitEstimate({
+      const estimateId = await submitEstimate({
         serviceType,
         estimate,
         totalSqFt,
@@ -84,8 +86,8 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
         materialNames: formatMaterialNames(),
         materialUrls: formatMaterialUrls(),
       });
-      toast({ title: 'Estimate submitted!', description: 'We\'ll be in touch soon.' });
-      onSchedule();
+      onSchedule(); // resets store state
+      navigate('/success', { state: { estimateId } });
     } catch {
       toast({ title: 'Submission failed', description: 'Please try again.', variant: 'destructive' });
     } finally {
@@ -95,7 +97,7 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
 
   return (
     <div className="space-y-4 sm:space-y-6 text-center">
-      <DollarSign className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-secondary flex-shrink-0" />
+      <DollarSign className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto text-secondary flex-shrink-0" />
       <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">Your Estimate</h2>
 
       <Card className="p-4 sm:p-5 md:p-6 bg-muted/30 border-secondary/30">
@@ -115,10 +117,10 @@ const EstimateCard = ({ estimate, flatFee, totalSqFt, pricePerSqFt, serviceType,
                       </div>
                       <span className="font-semibold text-foreground text-xs sm:text-sm flex-shrink-0">{formatCurrency(roomCost)}</span>
                     </div>
-                    <div className="flex items-center justify-between bg-gray-100 dark:bg-gray-800 p-1.5 sm:p-2 rounded text-xs">
+                    <div className="flex items-center justify-between bg-muted p-1.5 sm:p-2 rounded text-xs">
                       <div className="min-w-0">
-                        <div className="font-medium text-gray-900 dark:text-gray-100 truncate">{matName}</div>
-                        <div className="text-gray-600 dark:text-gray-400 text-xs">@${price.toFixed(2)}/sqft</div>
+                        <div className="font-medium text-foreground truncate">{matName}</div>
+                        <div className="text-muted-foreground text-xs">@${price.toFixed(2)}/sqft</div>
                       </div>
                       {rm.url && (
                         <a 

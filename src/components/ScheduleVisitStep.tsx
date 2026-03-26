@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { CalendarCheck, AlertTriangle } from 'lucide-react';
@@ -8,7 +9,7 @@ import LoadingSpinner from './LoadingSpinner';
 
 interface ScheduleVisitStepProps {
   serviceType: 'flooring' | 'cleaning';
-  contact: { name: string; email: string; phone: string };
+  contact: { name: string; email: string; phone: string; observations?: string };
   address?: string;
   zipCode?: string;
   coverageType: string;
@@ -18,11 +19,12 @@ interface ScheduleVisitStepProps {
 const ScheduleVisitStep = ({ serviceType, contact, address, zipCode, coverageType, onDone }: ScheduleVisitStepProps) => {
   const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleSubmit = async () => {
     setSubmitting(true);
     try {
-      await submitEstimate({
+      const estimateId = await submitEstimate({
         serviceType,
         contact,
         address: address || 'Not provided',
@@ -31,8 +33,8 @@ const ScheduleVisitStep = ({ serviceType, contact, address, zipCode, coverageTyp
         needsMeasurement: true,
         estimate: null,
       });
-      toast({ title: 'Request submitted!', description: 'We\'ll contact you to schedule a measurement visit.' });
-      onDone();
+      onDone(); // resets store state
+      navigate('/success', { state: { estimateId, type: 'schedule' } });
     } catch {
       toast({ title: 'Submission failed', description: 'Please try again.', variant: 'destructive' });
     } finally {
@@ -42,7 +44,7 @@ const ScheduleVisitStep = ({ serviceType, contact, address, zipCode, coverageTyp
 
   return (
     <div className="space-y-4 sm:space-y-6 text-center">
-      <CalendarCheck className="h-10 w-10 sm:h-12 sm:w-12 mx-auto text-primary flex-shrink-0" />
+      <CalendarCheck className="h-8 w-8 sm:h-10 sm:w-10 md:h-12 md:w-12 mx-auto text-primary flex-shrink-0" />
       <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold">Schedule a Measurement Visit</h2>
 
       <Card className="p-4 sm:p-5 md:p-6 bg-muted/30 text-left space-y-2 sm:space-y-3">

@@ -268,40 +268,37 @@ export async function submitEstimate(payload: {
   materialNames?: string;
   materialUrls?: string;
   [key: string]: unknown;
-}): Promise<void> {
-  try {
-    // Determine estimate type based on whether we have a price
-    const estimateType = payload.estimate || payload.needsMeasurement ? 'schedule' : 'estimate';
-    
-    const requestData = {
-      service: payload.serviceType,
-      type: estimateType,
-      contact: payload.contact,
-      address: payload.address,
-      zipCode: payload.zipCode || 'N/A',
-      totalSqFt: payload.totalSqFt,
-      coverage: payload.coverage,
-      material: payload.material,
-      cleaningType: payload.cleaningType,
-      frequency: payload.frequency,
-      price: payload.estimate,
-      roomDetails: payload.roomDetails,
-      materialNames: payload.materialNames,
-      materialUrls: payload.materialUrls,
-    };
+}): Promise<string> {
+  const estimateId = `EST-${Date.now()}`;
+  const estimateType = payload.estimate || payload.needsMeasurement ? 'schedule' : 'estimate';
 
-    const response = await fetch('/api/submit-estimate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(requestData),
-    });
+  const requestData = {
+    service: payload.serviceType,
+    type: estimateType,
+    contact: payload.contact,
+    address: payload.address,
+    zipCode: payload.zipCode || 'N/A',
+    totalSqFt: payload.totalSqFt,
+    coverage: payload.coverage,
+    material: payload.material,
+    cleaningType: payload.cleaningType,
+    frequency: payload.frequency,
+    price: payload.estimate,
+    roomDetails: payload.roomDetails,
+    materialNames: payload.materialNames,
+    materialUrls: payload.materialUrls,
+  };
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error || 'Failed to submit estimate');
-    }
-  } catch (error) {
-    console.error('Error submitting estimate:', error);
-    // Don't throw - let the UI handle errors gracefully
+  const response = await fetch('/api/submit-estimate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(requestData),
+  });
+
+  if (!response.ok) {
+    const error = await response.json().catch(() => ({}));
+    throw new Error(error.error || 'Failed to submit estimate');
   }
+
+  return estimateId;
 }

@@ -28,7 +28,7 @@ const Portfolio = () => {
     <div className="relative bg-background flex flex-col overflow-y-auto">
       {/* Dual Background - fixed */}
       <div className="fixed inset-0 flex pointer-events-none">
-        <div className="absolute inset-0 flex hidden md:flex">
+        <div className="absolute inset-0 hidden md:flex">
           <div 
             className="w-1/2 bg-cover bg-center" 
             style={{ backgroundImage: `url(${bgFlooring})` }} 
@@ -144,7 +144,7 @@ const Portfolio = () => {
                   <button
                     onClick={() => setRightImagePage(Math.max(0, rightImagePage - 1))}
                     disabled={rightImagePage === 0}
-                    className="flex-shrink-0 p-1.5 sm:p-2 bg-yellow-300/20 hover:bg-yellow-300/40 disabled:opacity-30 disabled:cursor-not-allowed text-yellow-300 rounded-lg transition-all"
+                    className="flex-shrink-0 p-2 sm:p-2.5 bg-yellow-300/20 hover:bg-yellow-300/40 disabled:opacity-30 disabled:cursor-not-allowed text-yellow-300 rounded-lg transition-all"
                     aria-label="Previous"
                   >
                     <ChevronLeft className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -166,7 +166,7 @@ const Portfolio = () => {
                   <button
                     onClick={() => setRightImagePage(Math.min(Math.ceil(smallItems.length / 4) - 1, rightImagePage + 1))}
                     disabled={rightImagePage >= Math.ceil(smallItems.length / 4) - 1}
-                    className="flex-shrink-0 p-1.5 sm:p-2 bg-yellow-300/20 hover:bg-yellow-300/40 disabled:opacity-30 disabled:cursor-not-allowed text-yellow-300 rounded-lg transition-all"
+                    className="flex-shrink-0 p-2 sm:p-2.5 bg-yellow-300/20 hover:bg-yellow-300/40 disabled:opacity-30 disabled:cursor-not-allowed text-yellow-300 rounded-lg transition-all"
                     aria-label="Next"
                   >
                     <ChevronRight className="h-3 w-3 sm:h-4 sm:w-4" />
@@ -179,45 +179,41 @@ const Portfolio = () => {
       </div>
 
       {/* Image Lightbox Modal */}
-      {selectedImage !== null && (
-        <div 
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
-          onClick={() => setSelectedImage(null)}
-        >
-          <div 
-            className="relative max-w-4xl max-h-screen w-full h-full md:w-auto md:h-auto p-4"
-            onClick={(e) => e.stopPropagation()}
+      {selectedImage !== null && (() => {
+        const activeItem = portfolioItems.find(item => item.id === selectedImage);
+        return (
+          <div
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+            onClick={() => setSelectedImage(null)}
           >
-            {/* Close Button */}
-            <button
-              onClick={() => setSelectedImage(null)}
-              className="absolute top-4 right-4 z-10 bg-yellow-300 hover:bg-yellow-400 text-black p-2 rounded-lg transition-colors"
-              aria-label="Close"
+            <div
+              className="relative max-w-4xl max-h-screen w-full h-full md:w-auto md:h-auto p-4"
+              onClick={(e) => e.stopPropagation()}
             >
-              <X className="h-6 w-6" />
-            </button>
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute top-2 right-2 sm:top-4 sm:right-4 z-10 bg-yellow-300 hover:bg-yellow-400 text-black p-2 sm:p-2.5 rounded-lg transition-colors"
+                aria-label="Close"
+              >
+                <X className="h-5 w-5 sm:h-6 sm:w-6" />
+              </button>
 
-            {/* Image */}
-            <img
-              src="/image.png"
-              alt={portfolioItems.find(item => item.id === selectedImage)?.title || 'Portfolio item'}
-              className="w-full h-full object-contain rounded-xl shadow-2xl"
-            />
+              <img
+                src="/image.png"
+                alt={activeItem?.title || 'Portfolio item'}
+                className="w-full h-full object-contain rounded-xl shadow-2xl"
+              />
 
-            {/* Item Info */}
-            {portfolioItems.find(item => item.id === selectedImage) && (
-              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-6 rounded-b-xl">
-                <h2 className="text-2xl font-bold text-white mb-2">
-                  {portfolioItems.find(item => item.id === selectedImage)?.title}
-                </h2>
-                <p className="text-yellow-300 font-semibold">
-                  {portfolioItems.find(item => item.id === selectedImage)?.category}
-                </p>
-              </div>
-            )}
+              {activeItem && (
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-3 sm:p-6 rounded-b-xl">
+                  <h2 className="text-lg sm:text-2xl font-bold text-white mb-1 sm:mb-2">{activeItem.title}</h2>
+                  <p className="text-yellow-300 font-semibold text-sm sm:text-base">{activeItem.category}</p>
+                </div>
+              )}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 };

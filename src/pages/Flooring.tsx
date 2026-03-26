@@ -1,5 +1,6 @@
 import { useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { toast } from 'sonner';
 import { useServiceStore } from '@/store/useServiceStore';
 import WizardLayout from '@/components/WizardLayout';
 import ContactInfoStep from '@/components/ContactInfoStep';
@@ -36,7 +37,6 @@ const Flooring = () => {
   const setStep = useServiceStore(s => s.setFlooringStep);
   const setContact = useServiceStore(s => s.setFlooringContact);
   const setAddress = useServiceStore(s => s.setFlooringAddress);
-  const setUseZillow = useServiceStore(s => s.setFlooringUseZillow);
   const setZillowData = useServiceStore(s => s.setFlooringZillowData);
   const setZipCode = useServiceStore(s => s.setFlooringZipCode);
   const setManualRooms = useServiceStore(s => s.setFlooringManualRooms);
@@ -68,9 +68,9 @@ const Flooring = () => {
     else navigate('/');
   }, [f.step, setStep, navigate]);
 
-  const handleContact = useCallback((data: { name: string; email: string; phone: string }) => {
+  const handleContact = useCallback((data: { name: string; email: string; phone: string; observations?: string }) => {
     setContact(data);
-    setStep(2); // Now goes directly to PropertyDetailsStep (was step 3, now step 2)
+    setStep(2);
   }, [setContact, setStep]);
 
   // COMMENTED: Zillow integration removed
@@ -128,16 +128,19 @@ const Flooring = () => {
   const handleMaterialSelect = useCallback((material: MaterialOption | null, manual: ManualMaterial | null, source: MaterialSource) => {
     // Validate zipCode
     if (!f.zipCode || f.zipCode.trim() === '') {
+      toast.error('ZIP code is missing. Please go back and fill in your property details.');
       return;
     }
 
     // Validate coverage-specific requirements
     if (f.coverageType === 'whole') {
       if (!f.totalSqFt || f.totalSqFt <= 0) {
+        toast.error('Square footage is missing. Please go back and enter your property details.');
         return;
       }
     } else {
       if (f.selectedRooms.length === 0) {
+        toast.error('No rooms selected. Please go back and define your rooms.');
         return;
       }
     }
@@ -160,13 +163,11 @@ const Flooring = () => {
 
   const handleEstimateSubmit = useCallback(() => {
     resetAll();
-    navigate('/');
-  }, [resetAll, navigate]);
+  }, [resetAll]);
 
   const handleScheduleDone = useCallback(() => {
     resetAll();
-    navigate('/');
-  }, [resetAll, navigate]);
+  }, [resetAll]);
 
   const totalSelectedSqFt = useMemo(
     () => f.coverageType === 'whole'

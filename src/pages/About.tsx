@@ -11,7 +11,7 @@ const About = () => {
     <div className="relative bg-background flex flex-col overflow-y-auto">
       {/* Split Background - fixed and scrollable with content */}
       <div className="fixed inset-0 flex pointer-events-none">
-        <div className="absolute inset-0 flex hidden md:flex">
+        <div className="absolute inset-0 hidden md:flex">
           <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${bgFlooring})` }} />
           <div className="w-1/2 bg-cover bg-center" style={{ backgroundImage: `url(${bgCleaning})` }} />
         </div>

@@ -1,14 +1,15 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { CheckCircle, Copy, Mail } from 'lucide-react';
+import { CheckCircle, CalendarCheck, Copy, Home, ArrowRight } from 'lucide-react';
 import { useState } from 'react';
 
 export default function Success() {
   const location = useLocation();
   const navigate = useNavigate();
-  const state = location.state as { estimateId?: string } | null;
+  const state = location.state as { estimateId?: string; type?: 'schedule' } | null;
   const estimateId = state?.estimateId || `EST-${Date.now()}`;
+  const isSchedule = state?.type === 'schedule';
   const [copied, setCopied] = useState(false);
 
   const copyToClipboard = () => {
@@ -18,114 +19,148 @@ export default function Success() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-background to-secondary/10 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
+
         {/* Logo */}
         <div className="flex justify-center mb-6">
-          <img src="/LogoJD.JPG" alt="JD Logo" className="h-16 w-auto" />
+          <img
+            src="/LogoJD.JPG"
+            alt="JD Logo"
+            className="h-12 sm:h-16 w-auto cursor-pointer hover:opacity-80 transition-opacity"
+            onClick={() => navigate('/')}
+            title="Back to Home"
+            style={{ borderRadius: 999 }}
+          />
         </div>
 
-        {/* Success Header */}
-        <div className="text-center mb-8">
+        {/* Header */}
+        <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
-            <CheckCircle className="w-20 h-20 text-green-500 animate-bounce" />
+            {isSchedule ? (
+              <div className="relative">
+                <div className="absolute inset-0 bg-primary/10 rounded-full scale-150 animate-ping opacity-30" />
+                <CalendarCheck className="w-14 h-14 sm:w-20 sm:h-20 text-primary relative z-10" />
+              </div>
+            ) : (
+              <div className="relative">
+                <div className="absolute inset-0 bg-green-400/20 rounded-full scale-150 animate-ping opacity-30" />
+                <CheckCircle className="w-14 h-14 sm:w-20 sm:h-20 text-green-500 relative z-10" />
+              </div>
+            )}
           </div>
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Orçamento Enviado!
+
+          <h1 className="text-2xl sm:text-3xl font-display font-bold text-foreground mb-2">
+            {isSchedule ? 'Visita Agendada!' : 'Orçamento Enviado!'}
           </h1>
-          <p className="text-gray-600">
-            Seu orçamento foi confirmado com sucesso
+          <p className="text-sm sm:text-base text-muted-foreground">
+            {isSchedule
+              ? 'Entraremos em contato para confirmar o horário da visita.'
+              : 'Seu orçamento foi registrado com sucesso.'}
           </p>
         </div>
 
-        {/* Confirmation Card */}
-        <Card className="p-6 mb-6 border-2 border-green-200 bg-white">
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">ID de Confirmação</p>
-              <div className="flex items-center gap-2 bg-green-50 p-3 rounded-lg border border-green-200">
-                <code className="text-sm font-mono font-bold text-green-700 flex-1">
-                  {estimateId}
-                </code>
-                <button
-                  onClick={copyToClipboard}
-                  className="p-1.5 hover:bg-green-200 rounded transition-colors"
-                  title="Copiar ID"
-                >
-                  <Copy className="w-4 h-4 text-green-600" />
-                </button>
-              </div>
-              {copied && (
-                <p className="text-xs text-green-600 mt-1">✓ Copiado!</p>
-              )}
-            </div>
-
-            <div className="bg-blue-50 p-4 rounded-lg border border-blue-200">
-              <div className="flex items-start gap-2">
-                <Mail className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div>
-                  <p className="text-sm font-semibold text-blue-900">
-                    Confirme seu Email
-                  </p>
-                  <p className="text-xs text-blue-800 mt-1">
-                    Você receberá um link de confirmação por email. Faça login para acompanhar seu orçamento.
-                  </p>
-                </div>
-              </div>
-            </div>
+        {/* Confirmation ID */}
+        <Card className="p-4 sm:p-5 mb-4 border-2 border-secondary/30 bg-card">
+          <p className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">
+            Número de Confirmação
+          </p>
+          <div className="flex items-center gap-2 bg-secondary/10 px-3 py-2.5 rounded-lg border border-secondary/20">
+            <code className="text-sm sm:text-base font-mono font-bold text-secondary flex-1 tracking-wide">
+              {estimateId}
+            </code>
+            <button
+              onClick={copyToClipboard}
+              className="p-2 hover:bg-secondary/20 rounded-md transition-colors flex-shrink-0"
+              title="Copiar ID"
+              aria-label="Copiar ID de confirmação"
+            >
+              <Copy className="w-4 h-4 text-secondary" />
+            </button>
           </div>
+          {copied && (
+            <p className="text-xs text-green-600 mt-1.5 font-medium">✓ Copiado para a área de transferência!</p>
+          )}
+          <p className="text-xs text-muted-foreground mt-2">
+            Guarde este número para acompanhar seu pedido.
+          </p>
         </Card>
 
-        {/* Info Cards */}
-        <div className="space-y-3 mb-6">
-          <Card className="p-4 bg-gray-50">
-            <h3 className="font-semibold text-gray-900 mb-2">Próximos Passos</h3>
-            <ul className="text-sm text-gray-700 space-y-1">
-              <li>✓ Seu orçamento foi registrado</li>
-              <li>✓ Você receberá um email de confirmação</li>
-              <li>✓ Um consultor entrará em contato em breve</li>
-            </ul>
-          </Card>
+        {/* Next Steps */}
+        <Card className="p-4 sm:p-5 mb-4 bg-card">
+          <h3 className="font-display font-semibold text-foreground mb-3 text-sm sm:text-base">
+            {isSchedule ? 'O que acontece agora?' : 'Próximos Passos'}
+          </h3>
+          <ul className="space-y-2.5">
+            {isSchedule ? (
+              <>
+                <li className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <span className="text-primary font-bold mt-0.5 flex-shrink-0">1.</span>
+                  Nossa equipe analisará seu pedido e entrará em contato em até 2 horas.
+                </li>
+                <li className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <span className="text-primary font-bold mt-0.5 flex-shrink-0">2.</span>
+                  Agendaremos a visita técnica no horário mais conveniente para você.
+                </li>
+                <li className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <span className="text-primary font-bold mt-0.5 flex-shrink-0">3.</span>
+                  Após medir os ambientes, enviaremos seu orçamento detalhado.
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  Orçamento registrado com sucesso.
+                </li>
+                <li className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  Nossa equipe analisará sua solicitação em breve.
+                </li>
+                <li className="flex items-start gap-2 text-xs sm:text-sm text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-green-500 mt-0.5 flex-shrink-0" />
+                  Um consultor entrará em contato para confirmar detalhes e agendar a visita.
+                </li>
+              </>
+            )}
+          </ul>
+        </Card>
 
-          <Card className="p-4 bg-yellow-50 border border-yellow-200">
-            <p className="text-xs text-yellow-800">
-              ⏱️ Geralmente respondemos em até 2 horas durante o horário comercial.
-            </p>
-          </Card>
+        {/* Response time notice */}
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-secondary/10 border border-secondary/20 mb-6">
+          <span className="text-secondary text-base flex-shrink-0">⏱️</span>
+          <p className="text-xs text-foreground/70">
+            Respondemos em até <strong className="text-foreground">2 horas</strong> durante o horário comercial
+            (Seg–Sex 8h–18h, Sáb 9h–16h).
+          </p>
         </div>
 
         {/* Actions */}
         <div className="space-y-3">
           <Button
             onClick={() => navigate('/')}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full gap-2 text-sm sm:text-base"
+            size="lg"
           >
-            ← Voltar para Início
+            <Home className="w-4 h-4" />
+            Voltar para o Início
           </Button>
 
-          <a
-            href={`mailto:?subject=Orçamento%20Quote%20Craft&body=Meu%20ID%20de%20confirmação:%20${estimateId}`}
-            className="block"
+          <Button
+            variant="outline"
+            onClick={() => navigate('/contact')}
+            className="w-full gap-2 text-sm sm:text-base border-2"
+            size="lg"
           >
-            <Button variant="outline" className="w-full">
-              <Mail className="w-4 h-4 mr-2" />
-              Compartilhar por Email
-            </Button>
-          </a>
+            Falar com a Equipe
+            <ArrowRight className="w-4 h-4" />
+          </Button>
         </div>
 
-        {/* Footer Note */}
-        <div className="mt-8 text-center text-xs text-gray-500">
-          <p>
-            Dúvidas? Contate suporte em{' '}
-            <a
-              href="mailto:support@quotecraft.com"
-              className="text-blue-600 hover:underline"
-            >
-              support@quotecraft.com
-            </a>
-          </p>
-        </div>
+        {/* Footer */}
+        <p className="mt-6 text-center text-xs text-muted-foreground">
+          © {new Date().getFullYear()} JD Flooring & Cleaning Service
+        </p>
       </div>
     </div>
   );

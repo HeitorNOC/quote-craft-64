@@ -1,14 +1,9 @@
-User-agent: Googlebot
-Allow: /
-
-User-agent: Bingbot
-Allow: /
-
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+# Do not index wizard/funnel steps (not useful for search engines)
+Disallow: /flooring
+Disallow: /cleaning
+Disallow: /success
+
+Sitemap: https://jdflooringcleaningservicesllc.com/sitemap.xml

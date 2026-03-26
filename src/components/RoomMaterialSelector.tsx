@@ -99,13 +99,16 @@ export const RoomMaterialSelector = ({
     };
 
     if (mode === 'same') {
-      // Apply to all rooms
+      // Apply same material to all rooms, using correct sqFt per room
       const allMaterials: RoomMaterialMapping = {};
       selectedRoomObjects.forEach((r) => {
-        allMaterials[r.name] = roomMat;
+        allMaterials[r.name] = { ...roomMat, sqFt: r.sqFt };
       });
       setMaterials(allMaterials);
-      onComplete(convertToArrayFn(allMaterials), totalCost);
+      // Calculate cost from the new materials directly — useMemo still reflects old state here
+      const price = roomMat.material?.pricePerSqFt || roomMat.manualPrice || 0;
+      const newTotalCost = selectedRoomObjects.reduce((sum, r) => sum + price * r.sqFt, 0);
+      onComplete(convertToArrayFn(allMaterials), newTotalCost);
     } else {
       // Move to next room
       const updated = {
@@ -117,10 +120,14 @@ export const RoomMaterialSelector = ({
         setMaterials(updated);
         setCurrentStep(currentStep + 1);
       } else {
-        // All rooms done
-        updated[currentRoom.name] = roomMat;
+        // All rooms done — calculate cost from the final updated map, not the stale memo
         setMaterials(updated);
-        onComplete(convertToArrayFn(updated), totalCost);
+        const newTotalCost = selectedRoomObjects.reduce((sum, r) => {
+          const mat = updated[r.name];
+          const price = mat?.material?.pricePerSqFt || mat?.manualPrice || 0;
+          return sum + price * r.sqFt;
+        }, 0);
+        onComplete(convertToArrayFn(updated), newTotalCost);
       }
     }
   };
@@ -138,10 +145,10 @@ export const RoomMaterialSelector = ({
         <CardContent className="space-y-4">
           <Button
             onClick={() => handleModeSelect('same')}
-            className="w-full h-24 text-lg font-semibold"
+            className="w-full h-auto min-h-[72px] sm:min-h-[96px] py-4 text-base sm:text-lg font-semibold"
             variant="outline"
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5 sm:gap-2">
               <span>Same Material for All Rooms</span>
               <span className="text-xs font-normal text-gray-600">
                 Apply one material to all {selectedRoomObjects.length} rooms
@@ -151,10 +158,10 @@ export const RoomMaterialSelector = ({
 
           <Button
             onClick={() => handleModeSelect('different')}
-            className="w-full h-24 text-lg font-semibold"
+            className="w-full h-auto min-h-[72px] sm:min-h-[96px] py-4 text-base sm:text-lg font-semibold"
             variant="outline"
           >
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5 sm:gap-2">
               <span>Different Material per Room</span>
               <span className="text-xs font-normal text-gray-600">
                 Choose a unique material for each room

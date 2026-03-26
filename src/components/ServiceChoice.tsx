@@ -82,7 +82,14 @@ const ServiceChoice = () => {
           <p className="text-xs sm:text-sm md:text-base text-primary-foreground/80 drop-shadow max-w-md mx-auto px-1 mt-0.5 sm:mt-1" style={{ lineHeight: '1.3' }}>
             Professional home services. Free estimate in minutes.
           </p>
-          <img src="/LogoJD.JPG" alt="JD Logo" className="h-16 sm:h-20 md:h-28 w-auto mx-auto drop-shadow-lg mt-1.5 sm:mt-2" style={{ borderRadius: 999 }} />
+          <img
+            src="/LogoJD.JPG"
+            alt="JD Logo"
+            className="h-16 sm:h-20 md:h-28 w-auto mx-auto drop-shadow-lg mt-1.5 sm:mt-2 cursor-pointer hover:opacity-80 transition-opacity"
+            style={{ borderRadius: 999 }}
+            onClick={() => navigate('/')}
+            title="Home"
+          />
         </header>
 
         {/* Main content - flex-1 grows to fill available space */}

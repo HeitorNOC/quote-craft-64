@@ -2,6 +2,7 @@ import { Progress } from '@/components/ui/progress';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface WizardLayoutProps {
   step: number;
@@ -17,6 +18,7 @@ interface WizardLayoutProps {
 const defaultLabels = ['Contact', 'Data Source', 'Coverage', 'Details', 'Options', 'Estimate'];
 
 const WizardLayout = ({ step, totalSteps = 6, title, subtitle, stepLabels, onBack, bgImage, children }: WizardLayoutProps) => {
+  const navigate = useNavigate();
   const progress = (step / totalSteps) * 100;
   const labels = stepLabels ?? defaultLabels;
   const currentLabel = labels[step - 1] ?? '';
@@ -27,7 +29,14 @@ const WizardLayout = ({ step, totalSteps = 6, title, subtitle, stepLabels, onBac
       <div className="relative z-10 flex flex-col h-full overflow-hidden mx-auto max-w-2xl w-full px-3 sm:px-4 md:px-6">
         {/* Header section - fixed height */}
         <div className="flex-shrink-0 py-2 sm:py-3 md:py-4 flex flex-col items-center">
-          <img src="/LogoJD.JPG" alt="JD Logo" className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 drop-shadow object-contain flex-shrink-0" style={{ borderRadius: 999 }} />
+          <img
+            src="/LogoJD.JPG"
+            alt="JD Logo"
+            className="h-12 sm:h-16 md:h-20 w-12 sm:w-16 md:w-20 drop-shadow object-contain flex-shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+            style={{ borderRadius: 999 }}
+            onClick={() => navigate('/')}
+            title="Back to Home"
+          />
           
           {/* Step indicator and title - fixed */}
           <div className="mt-1.5 sm:mt-2 md:mt-3 w-full flex flex-col">
