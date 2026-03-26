@@ -49,7 +49,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
 
     // Initialize Resend with API key
     const resendApiKey = process.env.RESEND_API_KEY;
-    const jdCompanyEmail = process.env.VITE_JD_COMPANY_EMAIL || 'contact@jdservices.com';
+    const jdCompanyEmail = process.env.VITE_JD_COMPANY_EMAIL || 'contact@jdflooringcleaningservicesllc.com';
 
     if (!resendApiKey) {
       console.error('RESEND_API_KEY not configured');
@@ -93,8 +93,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
           <h3>Your Message Summary:</h3>
           <p>${message.replace(/\n/g, '<br>')}</p>
           <hr style="margin: 20px 0;">
-          <p>If you need to reach us urgently, please call us at (555) 123-4567.</p>
-          <p style="color: #666;">Best regards,<br>JD Services Team</p>
+          <p>If you need to reach us urgently, please call or WhatsApp us at +1 (941) 274-9845.</p>
+          <p style="color: #666;">Best regards,<br>JD Flooring &amp; Cleaning Services Team</p>
         </div>
       `,
     });

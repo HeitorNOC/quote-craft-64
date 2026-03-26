@@ -34,14 +34,15 @@ async function getSheets() {
   return google.sheets({ version: 'v4', auth });
 }
 
-async function appendToSheet(sheetName: string, values: any[][]) {
+async function appendToSheet(sheetName: string, values: any[][], service: 'flooring' | 'cleaning') {
   const sheets = await getSheets();
-  
-  // Use single spreadsheet ID for both services (same sheet, different tabs)
-  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+
+  const spreadsheetId = service === 'flooring'
+    ? process.env.GOOGLE_FLOORING_SPREADSHEET_ID
+    : process.env.GOOGLE_CLEANING_SPREADSHEET_ID;
 
   if (!spreadsheetId) {
-    throw new Error('GOOGLE_SPREADSHEET_ID not configured');
+    throw new Error(`GOOGLE_${service.toUpperCase()}_SPREADSHEET_ID not configured`);
   }
 
   // Extract material names and URLs from roomDetails if not provided
@@ -61,13 +62,15 @@ async function appendToSheet(sheetName: string, values: any[][]) {
   });
 }
 
-async function ensureSheetExists(sheetName: string) {
+async function ensureSheetExists(sheetName: string, service: 'flooring' | 'cleaning') {
   const sheets = await getSheets();
-  
-  const spreadsheetId = process.env.GOOGLE_SPREADSHEET_ID;
+
+  const spreadsheetId = service === 'flooring'
+    ? process.env.GOOGLE_FLOORING_SPREADSHEET_ID
+    : process.env.GOOGLE_CLEANING_SPREADSHEET_ID;
 
   if (!spreadsheetId) {
-    throw new Error('GOOGLE_SPREADSHEET_ID not configured');
+    throw new Error(`GOOGLE_${service.toUpperCase()}_SPREADSHEET_ID not configured`);
   }
 
   try {
@@ -167,8 +170,8 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     }
 
     // Ensure sheet exists and append data
-    await ensureSheetExists(sheetName);
-    await appendToSheet(sheetName, rowData);
+    await ensureSheetExists(sheetName, data.service);
+    await appendToSheet(sheetName, rowData, data.service);
 
     return res.status(200).json({
       success: true,

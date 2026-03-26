@@ -149,7 +149,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-white">Email</p>
-                    <p className="text-xs text-white/80">contact@jdservices.com</p>
+                    <p className="text-xs text-white/80">contact@jdflooringcleaningservicesllc.com</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5">
@@ -158,7 +158,7 @@ const ContactPage = () => {
                   </div>
                   <div>
                     <p className="text-xs font-semibold text-white">Phone / WhatsApp</p>
-                    <p className="text-xs text-white/80">(555) 123-4567</p>
+                    <p className="text-xs text-white/80">+1 (941) 274-9845</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2.5">
